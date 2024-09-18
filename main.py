@@ -14,13 +14,8 @@ bot = telebot.TeleBot(TOKEN)
 def gptMessage(message):
     if message.text.startswith('/p '):
         question = message.text[3:]  # استخرج السؤال بعد الأمر /p
-        try:
-            # إرسال الرسالة إلى دالة gpt واستلام الرد
-            resp = gpt(question)
-            bot.send_message(message.chat.id, f'<b>العقرب : {resp}</b>', parse_mode='HTML')
-        except Exception as e:
-            # التعامل مع الأخطاء وإرسال رسالة تنبيهية
-            bot.send_message(message.chat.id, f'حدث خطأ: {e}', parse_mode='HTML')
+        resp = gpt(question)  # أزل معالجة الأخطاء
+        bot.send_message(message.chat.id, f'<b>العقرب : {resp}</b>', parse_mode='HTML')
     else:
         bot.send_message(message.chat.id, "يرجى استخدام الأمر /p متبوعًا بسؤالك.")
 
