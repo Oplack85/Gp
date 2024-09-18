@@ -1,0 +1,7 @@
+python-tgpt
+telebot
+g4f
+requests
+curl_cffi
+openai==0.28
+transformers
