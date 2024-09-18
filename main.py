@@ -10,9 +10,16 @@ if not TOKEN:
 # إنشاء بوت Telegram
 bot = telebot.TeleBot(TOKEN)
 
-@bot.message_handler(commands=['openai'])
-def openai_command(message):
-    bot.send_message(message.chat.id, "اكتب سؤالك وسأجيب عليه إن شاء الله.")
+@bot.message_handler(commands=['start'])
+def start(message):
+    start_message = (
+        '✎┊‌ اهلا بك في بوت الذكاء الاصطناعي الخاص بسورس العقرب '
+        'يمكنك طرح أي سؤال أو خدمة وسيتم الإجابة عنها إن شاء الله 😁\n\n'
+        'تم الصنيع بواسطة :\n'
+        'المطور [𝗠𝗼𝗵𝗮𝗺𝗲𝗱](t.me/Zo_r0) \n'
+        'المطور [𝗔𝗹𝗹𝗼𝘂𝘀𝗵](t.me/I_e_e_l)'
+    )
+    bot.send_message(message.chat.id, start_message, parse_mode='Markdown', disable_web_page_preview=True)
 
 @bot.message_handler(content_types=['text'])
 def gptMessage(message):
