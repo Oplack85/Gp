@@ -16,8 +16,6 @@ def gptMessage(message):
         question = message.text[3:]  # استخرج السؤال بعد الأمر /p
         resp = gpt(question)  # أزل معالجة الأخطاء
         bot.send_message(message.chat.id, f'<b>العقرب : {resp}</b>', parse_mode='HTML')
-    else:
-        bot.send_message(message.chat.id, "يرجى استخدام الأمر /p متبوعًا بسؤالك.")
 
 # بدء الاستماع للرسائل
 bot.infinity_polling()
