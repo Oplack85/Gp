@@ -1,14 +1,20 @@
-import telebot
 import os
-from gpt import gpt
+import telebot
+import pytgpt.phind
 
 # الحصول على توكن البوت من المتغير البيئي
-TOKEN = os.getenv('TOKEN')
+TOKEN = os.getenv('TG_BOT_TOKEN')
 if not TOKEN:
     raise ValueError("لم يتم تعيين متغير البيئة 'TOKEN'.")
 
 # إنشاء بوت Telegram
 bot = telebot.TeleBot(TOKEN)
+
+# إعداد GPT
+gpt_bot = pytgpt.phind.PHIND()
+
+def gpt(message):
+    return gpt_bot.chat(f'{message}')
 
 @bot.message_handler(content_types=['text'])
 def gptMessage(message):
