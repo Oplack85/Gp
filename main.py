@@ -2,10 +2,8 @@ import os
 import telebot
 import pytgpt.phind
 
-# الحصول على توكن البوت من المتغير البيئي
-TOKEN = os.getenv('TOKEN')
-if not TOKEN:
-    raise ValueError("لم يتم تعيين متغير البيئة 'TOKEN'.")
+# ضع توكن البوت هنا
+TOKEN = '7218686976:AAH3doF67rbhtGGEbiIVn_XgxdYPcTxE5uI'
 
 # إنشاء بوت Telegram
 bot = telebot.TeleBot(TOKEN)
@@ -18,10 +16,10 @@ def gpt(message):
 
 @bot.message_handler(content_types=['text'])
 def gptMessage(message):
-    if message.text.startswith('/p '):
-        question = message.text[3:]  # استخرج السؤال بعد الأمر /p
-        resp = gpt(question)  # أزل معالجة الأخطاء
-        bot.send_message(message.chat.id, f'<b>العقرب : {resp}</b>', parse_mode='HTML')
+    if message.text.startswith('/Gpt'):
+        question = message.text[4:]  # استخرج السؤال بعد الأمر /Gpt
+        resp = gpt(question)
+        bot.send_message(message.chat.id, f'Gpt : {resp}', parse_mode='HTML')
 
 # بدء الاستماع للرسائل
 bot.infinity_polling()
