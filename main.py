@@ -63,16 +63,21 @@ def check_for_new_messages(chat_id, email):
 # عند بدء المحادثة مع البوت
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
+
+    markup = types.InlineKeyboardMarkup()
+    subscribe_button = types.InlineKeyboardButton("𝗦𝗰𝗼𝗿𝗽𝗶𝗼𝗻 𝗖𝗵𝗮𝗻𝗻𝗲𝗹 ✍🏻", url="https://t.me/Scorpion_scorp")
+    markup.add(subscribe_button)
+    
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     button_email = types.KeyboardButton("إنشاء إيميل")
     markup.add(button_email)
-    bot.send_message(message.chat.id, "*✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهميه*\n*الخاص بسورس العقرب ✓*\n\n*فقط اضغط على الزر أدناه لإنشاء إيميل 😁*", reply_markup=markup, parse_mode='Markdown')
+    bot.send_message(message.chat.id, "*✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهمية*\n*الخاص بسورس العقرب ✓*\n\n*فقط اضغط على الزر أدناه لإنشاء إيميل 😁* \n\n تم تطوير البوت بواسطة : \nالمطور [𝗠𝗼𝗵𝗮𝗺𝗲𝗱](t.me/Zo_r0) \nالمطور [𝗔𝗹𝗹𝗼𝘂𝘀𝗵](t.me/I_e_e_l)", reply_markup=markup, parse_mode='Markdown', disable_web_page_preview=True)
 # عند الضغط على زر إنشاء إيميل
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
 def send_fake_email(message):
     email = get_fake_email()
     user_emails[message.chat.id] = email  # تخزين الإيميل للمستخدم
-    bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه\n\nإضغط للنسخ [* `{email}` *]\n\n✎┊‌ عزيزي اي طلب او رساله تجي عل ايميل راح تندز مباشرة مراح تحتاج جلب رسالة وغيرها ✓*", parse_mode='Markdown')
+    bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه ✅\n\nإضغط للنسخ [* `{email}` *]\n\n✎┊‌ عزيزي اي طلب او رسالة تجي عل ايميل راح تندز مباشرة مراح تحتاج جلب رسالة وغيرها *", parse_mode='Markdown')
     
     # بدء عملية مراقبة الرسائل في صندوق الوارد
     email_thread = threading.Thread(target=check_for_new_messages, args=(message.chat.id, email))
