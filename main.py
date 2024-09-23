@@ -51,8 +51,8 @@ def check_for_new_messages(chat_id, email):
                     full_message = get_message_content(email, message_id)
                     body = full_message.get('textBody')
                     if not body:
-                        body = full_message.get('htmlBody', 'المحتوى غير متاح')
-                        if body != 'المحتوى غير متاح':
+                        body = full_message.get('htmlBody', '✎┊‌ الرسالة فارغه')
+                        if body != '✎┊‌ الرسالة فارغه ':
                             body = html_to_text(body)
 
                     bot.send_message(chat_id, body)  # إرسال محتوى الرسالة فقط
@@ -62,14 +62,14 @@ def check_for_new_messages(chat_id, email):
 # عند بدء المحادثة مع البوت
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "مرحباً! سأقوم بجلب إيميلات وهمية ومتابعة رسائلها الواردة.")
+    bot.reply_to(message, "**✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهميه\n الخاص بسورس العقرب ✓ \n\n فقط اضغط على [ انشاء ايميل ] \n وسيتم ارسال الايميل 😁 \n\n مطورين البوت : \n **")
 
 # عند طلب المستخدم جلب إيميل وهمي
 @bot.message_handler(commands=['getemail'])
 def send_fake_email(message):
     email = get_fake_email()
     user_emails[message.chat.id] = email  # تخزين الإيميل للمستخدم
-    bot.reply_to(message, f"إيميل وهمي تم إنشاؤه: {email}\nسيتم الآن متابعة الرسائل الجديدة.")
+    bot.reply_to(message, f"**✎┊‌ إيميل وهمي تم إنشاؤه \n إضغط للنسخ [ `{email}` ]\n✎┊‌ عزيزي اي طلب او رساله تجي عل ايميل راح تندز مباشرة مراح تحتاج جلب رسالة وغيرها ✓** ")
     
     # بدء عملية مراقبة الرسائل في صندوق الوارد
     email_thread = threading.Thread(target=check_for_new_messages, args=(message.chat.id, email))
