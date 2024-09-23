@@ -3,6 +3,7 @@ import requests
 import time
 import threading
 from bs4 import BeautifulSoup
+from telebot import types  # استيراد المكتبة الخاصة بالأزرار
 
 # ضع هنا التوكن الخاص بالبوت
 API_TOKEN = '7218686976:AAHKUWhhQFNIPfr12Yg0v08g7bti8OPdXsA'
@@ -62,10 +63,13 @@ def check_for_new_messages(chat_id, email):
 # عند بدء المحادثة مع البوت
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "**✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهميه\n الخاص بسورس العقرب ✓ \n\n فقط اضغط على [ انشاء ايميل ] \n وسيتم ارسال الايميل 😁 \n\n مطورين البوت : \n **")
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button = types.KeyboardButton("إنشاء إيميل")
+    markup.add(button)
+    bot.send_message(message.chat.id, "**✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهميه\n الخاص بسورس العقرب ✓ \n\n فقط اضغط على الزر أدناه لإنشاء إيميل 😊 \n\n مطورين البوت : \n **", reply_markup=markup)
 
-# عند طلب المستخدم جلب إيميل وهمي
-@bot.message_handler(commands=['getemail'])
+# عند الضغط على زر إنشاء إيميل
+@bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
 def send_fake_email(message):
     email = get_fake_email()
     user_emails[message.chat.id] = email  # تخزين الإيميل للمستخدم
