@@ -5,7 +5,7 @@ import threading
 from bs4 import BeautifulSoup
 
 # ضع هنا التوكن الخاص بالبوت
-API_TOKEN = 'YOUR_TELEGRAM_BOT_API_TOKEN'
+API_TOKEN = '7218686976:AAHKUWhhQFNIPfr12Yg0v08g7bti8OPdXsA'
 
 # إنشاء البوت باستخدام التوكن
 bot = telebot.TeleBot(API_TOKEN)
