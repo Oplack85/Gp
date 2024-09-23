@@ -65,12 +65,8 @@ def check_for_new_messages(chat_id, email):
 def send_welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     button_email = types.KeyboardButton("إنشاء إيميل")
-    subscribe_button = types.InlineKeyboardButton("اشترك في القتاة", url="https://t.me/Scorpion_scorp")
-    
     markup.add(button_email)
-    markup.add(subscribe_button)  # إضافة زر الاشتراك إلى قائمة الأزرار
-
-    bot.send_message(message.chat.id, "[𝗦𝗖 𝗙𝗮𝗸𝗲 𝗠𝗮𝗶𝗟 📮](https://t.me/Scorpion_scorp)\n\n*✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهمية 👋🏻*\n\n*للحصول على ايميل اضغط على انشاء ايميل فقط ✍🏻* \n\n تم تطوير البوت بواسطة : \nالمطور [𝗠𝗼𝗵𝗮𝗺𝗲𝗱](t.me/Zo_r0) \nالمطور [𝗔𝗹𝗹𝗼𝘂𝘀𝗵](t.me/I_e_e_l)", reply_markup=markup, parse_mode='Markdown', disable_web_page_preview=True)
+    bot.send_message(message.chat.id, "[𝗦𝗖 𝗙𝗮𝗸𝗲 𝗠𝗮𝗶𝗟 📮](https://t.me/Scorpion_scorp)\n\n*✎┊‌ مرحبا بك في بوت الايميلات الوهمية 👋🏻*\n\n*للحصول على ايميل اضغط على انشاء ايميل ✍🏻* \n\n* تم تطوير البوت بواسطة :* \n*المطور* [𝗠𝗼𝗵𝗮𝗺𝗲𝗱](t.me/Zo_r0) \n*المطور* [𝗔𝗹𝗹𝗼𝘂𝘀𝗵](t.me/I_e_e_l)", reply_markup=markup, parse_mode='Markdown', disable_web_page_preview=True)
 
 # عند الضغط على زر إنشاء إيميل
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
