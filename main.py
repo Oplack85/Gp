@@ -6,20 +6,20 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 # الحصول على التوكن من المتغيرات البيئية
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
-# دالة لجلب إيميل مؤقت من TempMail
+# دالة لجلب إيميل مؤقت من 10MinuteMail
 def get_temp_email():
-    response = requests.get("https://api.temp-mail.org/request/domains/format/json")
+    response = requests.get("https://10minutemail.com/session/address")
     if response.status_code == 200:
-        domains = response.json()
-        email_domain = domains[0]
-        email_address = f"myemail123{email_domain}"  # إنشاء إيميل وهمي
+        email_data = response.json()
+        email_address = email_data['address']  # جلب الإيميل من البيانات المستلمة
         return email_address
     else:
         return None
 
-# دالة لجلب الرسائل الواردة
+# دالة لجلب الرسائل الواردة (هذه الخدمة ربما تحتاج تعديل إذا كانت API توفرها)
 def get_inbox(email_address):
-    inbox_url = f"https://api.temp-mail.org/request/mail/id/{email_address}/format/json"
+    # هذا مجرد مثال لأن الموقع قد لا يوفر واجهة للرسائل الواردة
+    inbox_url = f"https://10minutemail.com/session/messages"
     response = requests.get(inbox_url)
     if response.status_code == 200:
         return response.json()
@@ -56,7 +56,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if email:
             inbox = get_inbox(email)
             if inbox:
-                message_list = "\n".join([message['mail_text_only'] for message in inbox])
+                message_list = "\n".join([message['message'] for message in inbox])
                 await query.edit_message_text(f"الرسائل الواردة:\n{message_list}")
             else:
                 await query.edit_message_text("لا توجد رسائل واردة بعد.")
@@ -74,3 +74,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
