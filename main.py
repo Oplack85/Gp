@@ -2,10 +2,10 @@ import telebot
 import requests
 import time
 import threading
-from bs4 import BeautifulSoup  # تأكد من تثبيت المكتبة
+from bs4 import BeautifulSoup
 
 # ضع هنا التوكن الخاص بالبوت
-API_TOKEN = '7218686976:AAHKUWhhQFNIPfr12Yg0v08g7bti8OPdXsA'
+API_TOKEN = 'YOUR_TELEGRAM_BOT_API_TOKEN'
 
 # إنشاء البوت باستخدام التوكن
 bot = telebot.TeleBot(API_TOKEN)
@@ -45,6 +45,10 @@ def check_for_new_messages(chat_id, email):
                 if message_id not in user_messages[chat_id]:
                     subject = msg.get('subject', 'لا يوجد موضوع')
                     sender = msg.get('from', 'غير معروف')
+                    
+                    # عرض محتويات الرسالة بالكامل للتأكد
+                    print(f"Received message data: {msg}")
+
                     # محاولة جلب النص العادي أو استخدام HTML إذا لم يكن النص متاحًا
                     body = msg.get('textBody')
                     if not body:  # إذا لم يكن هناك نص عادي، نستخدم htmlBody
