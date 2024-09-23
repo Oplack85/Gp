@@ -1,25 +1,77 @@
-import os
-import telebot
-import pytgpt.phind
+import requests
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# ضع توكن البوت هنا
-TOKEN = '7218686976:AAH3doF67rbhtGGEbiIVn_XgxdYPcTxE5uI'
+# استبدل هذا بالتوكن الذي تحصلت عليه من BotFather
+TELEGRAM_BOT_TOKEN = '7218686976:AAH3doF67rbhtGGEbiIVn_XgxdYPcTxE5uI'
 
-# إنشاء بوت Telegram
-bot = telebot.TeleBot(TOKEN)
+# دالة لجلب إيميل مؤقت من TempMail
+def get_temp_email():
+    response = requests.get("https://api.temp-mail.org/request/domains/format/json")
+    if response.status_code == 200:
+        domains = response.json()
+        email_domain = domains[0]
+        email_address = f"myemail123{email_domain}"  # إنشاء إيميل وهمي
+        return email_address
+    else:
+        return None
 
-# إعداد GPT
-gpt_bot = pytgpt.phind.PHIND()
+# دالة لجلب الرسائل الواردة
+def get_inbox(email_address):
+    inbox_url = f"https://api.temp-mail.org/request/mail/id/{email_address}/format/json"
+    response = requests.get(inbox_url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
 
-def gpt(message):
-    return gpt_bot.chat(f'{message}')
+# دالة لبدء البوت
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("جلب إيميل وهمي", callback_data='get_email')],
+        [InlineKeyboardButton("جلب الرسائل", callback_data='get_inbox')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-@bot.message_handler(content_types=['text'])
-def gptMessage(message):
-    if message.text.startswith('/Gpt'):
-        question = message.text[4:]  # استخرج السؤال بعد الأمر /Gpt
-        resp = gpt(question)
-        bot.send_message(message.chat.id, f'Gpt : {resp}', parse_mode='HTML')
+    await update.message.reply_text('أهلاً بك! اختر أحد الخيارات:', reply_markup=reply_markup)
 
-# بدء الاستماع للرسائل
-bot.infinity_polling()
+# دالة لتنفيذ الأوامر عند الضغط على الأزرار
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == 'get_email':
+        # إنشاء إيميل وهمي
+        email = get_temp_email()
+        if email:
+            context.user_data['email'] = email  # تخزين الإيميل للاستخدام لاحقًا
+            await query.edit_message_text(f"تم إنشاء إيميل وهمي: {email}")
+        else:
+            await query.edit_message_text("فشل في جلب الإيميل الوهمي.")
+    
+    elif query.data == 'get_inbox':
+        # جلب الرسائل الواردة للإيميل المخزن
+        email = context.user_data.get('email')
+        if email:
+            inbox = get_inbox(email)
+            if inbox:
+                message_list = "\n".join([message['mail_text_only'] for message in inbox])
+                await query.edit_message_text(f"الرسائل الواردة:\n{message_list}")
+            else:
+                await query.edit_message_text("لا توجد رسائل واردة بعد.")
+        else:
+            await query.edit_message_text("يرجى جلب الإيميل أولاً باستخدام الزر المخصص.")
+
+# تشغيل البوت
+async def main():
+    app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button_handler))
+
+    await app.start_polling()
+    await app.idle()
+
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(main())
