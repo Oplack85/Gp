@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from telebot import types
 
 # ضع هنا التوكن الخاص بالبوت
-API_TOKEN = '7218686976:AAHKUWhhQFNIPfr12Yg0v08g7bti8OPdXsA'
+API_TOKEN = '7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc'
 
 # إنشاء البوت باستخدام التوكن
 bot = telebot.TeleBot(API_TOKEN)
