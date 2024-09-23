@@ -1,8 +1,2 @@
-python-tgpt
-telebot
-g4f
-requests
-curl_cffi
-openai==0.28
-transformers
-gunicorn
+python-telegram-bot==20.3
+requests==2.31.0
