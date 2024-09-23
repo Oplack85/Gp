@@ -1,9 +1,10 @@
+import os
 import requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# استبدل هذا بالتوكن الذي تحصلت عليه من BotFather
-TELEGRAM_BOT_TOKEN = '7218686976:AAH3doF67rbhtGGEbiIVn_XgxdYPcTxE5uI'
+# الحصول على التوكن من المتغيرات البيئية
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 # دالة لجلب إيميل مؤقت من TempMail
 def get_temp_email():
@@ -69,7 +70,7 @@ async def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
 
-    await app.start_polling()
+    await app.run_polling()  # استخدم run_polling() بدلاً من start_polling
     await app.idle()
 
 if __name__ == '__main__':
