@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from telebot import types
 
 # ضع هنا التوكن الخاص بالبوت
-API_TOKEN = '7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc'
+API_TOKEN = '7218686976:AAHKUWhhQFNIPfr12Yg0v08g7bti8OPdXsA'
 
 # إنشاء البوت باستخدام التوكن
 bot = telebot.TeleBot(API_TOKEN)
@@ -64,10 +64,14 @@ def check_for_new_messages(chat_id, email):
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button = types.KeyboardButton("إنشاء إيميل")
-    markup.add(button)
-    bot.send_message(message.chat.id, "*✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهميه*\n*الخاص بسورس العقرب ✓*\n\n*فقط اضغط على الزر أدناه لإنشاء إيميل 😊*\n\n*مطورين البوت :*", reply_markup=markup, parse_mode='Markdown')
+    button_email = types.KeyboardButton("إنشاء إيميل")
+    markup.add(button_email)
+    
+    channel_markup = types.InlineKeyboardMarkup()
+    button_channel = types.InlineKeyboardButton("اشتراك في القناة", url="https://t.me/YourChannelLink")  # استبدل الرابط برابط قناتك
+    channel_markup.add(button_channel)
 
+    bot.send_message(message.chat.id, "*✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهميه*\n*الخاص بسورس العقرب ✓*\n\n*فقط اضغط على الزر أدناه لإنشاء إيميل 😊*\n\n*للاشتراك في القناة اضغط الزر أدناه:*", reply_markup=markup, parse_mode='Markdown')
 # عند الضغط على زر إنشاء إيميل
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
 def send_fake_email(message):
