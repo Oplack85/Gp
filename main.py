@@ -19,7 +19,7 @@ def get_temp_email():
     else:
         return None
 
-# دالة لجلب الرسائل الواردة (تعديل حسب الخدمة)
+# دالة لجلب الرسائل الواردة
 def get_inbox(email_address):
     inbox_url = "https://10minutemail.com/session/messages"
     response = requests.get(inbox_url)
@@ -78,8 +78,13 @@ def main():
     app.bot.add_handler(CommandHandler("start", start))
     app.bot.add_handler(CallbackQueryHandler(button_handler))
 
-    app.bot.set_webhook(f"https://YOUR_WEBHOOK_URL/{TELEGRAM_BOT_TOKEN}")
+    # تشغيل Webhook
+    app.bot.run_webhook(listen="0.0.0.0",
+                        port=int(os.environ.get('PORT', 8443)),
+                        url_path=TELEGRAM_BOT_TOKEN,
+                        webhook_url=f"https://YOUR_WEBHOOK_URL/{TELEGRAM_BOT_TOKEN}")
 
 if __name__ == '__main__':
     main()
     app.run(port=int(os.environ.get('PORT', 8443)))
+    
