@@ -1,15 +1,16 @@
 import telebot
 import requests
 
-# ضع هنا التوكن الخاص بالبوت
-API_TOKEN = '7218686976:AAH3doF67rbhtGGEbiIVn_XgxdYPcTxE5uI'
+# ضع هنا التوكن الخاص بالبوت الذي حصلت عليه من BotFather
+API_TOKEN = 'YOUR_TELEGRAM_BOT_API_TOKEN'
 
+# إنشاء البوت باستخدام التوكن
 bot = telebot.TeleBot(API_TOKEN)
 
 # متغير لتخزين الإيميل الوهمي لكل مستخدم
 user_emails = {}
 
-# دالة لجلب إيميل وهمي
+# دالة لجلب إيميل وهمي من 1secmail
 def get_fake_email():
     response = requests.get('https://www.1secmail.com/api/v1/?action=genRandomMailbox')
     email = response.json()[0]
@@ -46,10 +47,14 @@ def send_fake_email_messages(message):
 
     if messages:
         for msg in messages:
-            bot.reply_to(message, f"رسالة جديدة:\nالموضوع: {msg['subject']}\nالمرسل: {msg['from']}\nالمحتوى: {msg['textBody']}")
+            subject = msg.get('subject', 'لا يوجد موضوع')  # تحقق من وجود 'subject'
+            sender = msg.get('from', 'غير معروف')  # تحقق من وجود 'from'
+            # تحقق من وجود 'textBody' أو استخدم 'htmlBody' كبديل
+            body = msg.get('textBody') or msg.get('htmlBody') or 'المحتوى غير متاح'
+
+            bot.reply_to(message, f"رسالة جديدة:\nالموضوع: {subject}\nالمرسل: {sender}\nالمحتوى: {body}")
     else:
         bot.reply_to(message, "لا توجد رسائل حالياً.")
 
 # تشغيل البوت
 bot.infinity_polling()
-            
