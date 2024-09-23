@@ -3,7 +3,7 @@ import requests
 import time
 import threading
 from bs4 import BeautifulSoup
-from telebot import types  # استيراد المكتبة الخاصة بالأزرار
+from telebot import types
 
 # ضع هنا التوكن الخاص بالبوت
 API_TOKEN = '7218686976:AAHKUWhhQFNIPfr12Yg0v08g7bti8OPdXsA'
@@ -66,14 +66,14 @@ def send_welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     button = types.KeyboardButton("إنشاء إيميل")
     markup.add(button)
-    bot.send_message(message.chat.id, "**✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهميه\n الخاص بسورس العقرب ✓ \n\n فقط اضغط على الزر أدناه لإنشاء إيميل 😊 \n\n مطورين البوت : \n **", reply_markup=markup)
+    bot.send_message(message.chat.id, "*✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهميه*\n*الخاص بسورس العقرب ✓*\n\n*فقط اضغط على الزر أدناه لإنشاء إيميل 😊*\n\n*مطورين البوت :*", reply_markup=markup, parse_mode='Markdown')
 
 # عند الضغط على زر إنشاء إيميل
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
 def send_fake_email(message):
     email = get_fake_email()
     user_emails[message.chat.id] = email  # تخزين الإيميل للمستخدم
-    bot.reply_to(message, f"**✎┊‌ إيميل وهمي تم إنشاؤه \n إضغط للنسخ [ `{email}` ]\n✎┊‌ عزيزي اي طلب او رساله تجي عل ايميل راح تندز مباشرة مراح تحتاج جلب رسالة وغيرها ✓** ")
+    bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه*\n*إضغط للنسخ [ `{email}` ]*\n*✎┊‌ عزيزي اي طلب او رساله تجي عل ايميل راح تندز مباشرة مراح تحتاج جلب رسالة وغيرها ✓*", parse_mode='Markdown')
     
     # بدء عملية مراقبة الرسائل في صندوق الوارد
     email_thread = threading.Thread(target=check_for_new_messages, args=(message.chat.id, email))
