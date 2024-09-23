@@ -45,29 +45,17 @@ def check_for_new_messages(chat_id, email):
         if messages:
             for msg in messages:
                 message_id = msg['id']
-                # التأكد من أن الرسالة جديدة ولم يتم عرضها من قبل
                 if chat_id not in user_messages:
                     user_messages[chat_id] = []
                 if message_id not in user_messages[chat_id]:
-                    subject = msg.get('subject', 'لا يوجد موضوع')
-                    sender = msg.get('from', 'غير معروف')
-                    
-                    # جلب محتويات الرسالة بالتفصيل باستخدام ID الرسالة
                     full_message = get_message_content(email, message_id)
-                    
-                    # عرض محتويات الرسالة كاملة في logs لفحص الحقول
-                    print(f"Full message content: {full_message}")
-                    
-                    # محاولة جلب النص العادي أو استخدام HTML إذا لم يكن النص متاحًا
                     body = full_message.get('textBody')
-                    if not body:  # إذا لم يكن هناك نص عادي، نستخدم htmlBody
+                    if not body:
                         body = full_message.get('htmlBody', 'المحتوى غير متاح')
-                        # تحويل HTML إلى نص عادي إذا كان متاحاً
                         if body != 'المحتوى غير متاح':
                             body = html_to_text(body)
 
-                    bot.send_message(chat_id, f"رسالة جديدة:\nالموضوع: {subject}\nالمرسل: {sender}\nالمحتوى: {body}")
-                    # حفظ معرف الرسالة لتجنب التكرار
+                    bot.send_message(chat_id, body)  # إرسال محتوى الرسالة فقط
                     user_messages[chat_id].append(message_id)
         time.sleep(10)  # الانتظار لمدة 10 ثوانٍ قبل التحقق مرة أخرى
 
