@@ -1,90 +1,53 @@
-import os
+import telebot
 import requests
-from flask import Flask, request
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-app = Flask(__name__)
+# ضع هنا التوكن الخاص بالبوت الذي حصلت عليه من BotFather
+API_TOKEN = '7218686976:AAH3doF67rbhtGGEbiIVn_XgxdYPcTxE5uI'
 
-# الحصول على التوكن من المتغيرات البيئية
-TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+# إنشاء البوت باستخدام توكن
+bot = telebot.TeleBot(API_TOKEN)
 
-# دالة لجلب إيميل مؤقت من 10MinuteMail
-def get_temp_email():
-    response = requests.get("https://10minutemail.com/session/address")
-    if response.status_code == 200:
-        email_data = response.json()
-        email_address = email_data['address']  # جلب الإيميل من البيانات المستلمة
-        return email_address
-    else:
-        return None
+# دالة لجلب الإيميل الوهمي من 1secmail
+def get_fake_email():
+    response = requests.get('https://www.1secmail.com/api/v1/?action=genRandomMailbox')
+    email = response.json()[0]
+    return email
 
-# دالة لجلب الرسائل الواردة
-def get_inbox(email_address):
-    inbox_url = "https://10minutemail.com/session/messages"
-    response = requests.get(inbox_url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
+# دالة لجلب الرسائل الواردة على الإيميل الوهمي
+def get_messages_from_email(email):
+    user, domain = email.split('@')
+    response = requests.get(f'https://www.1secmail.com/api/v1/?action=getMessages&login={user}&domain={domain}')
+    messages = response.json()
+    return messages
 
-# دالة لبدء البوت
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("جلب إيميل وهمي", callback_data='get_email')],
-        [InlineKeyboardButton("جلب الرسائل", callback_data='get_inbox')]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+# عندما يبدأ المستخدم محادثة مع البوت
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "مرحباً! سأقوم بجلب إيميلات وهمية ورسائلها.")
 
-    await update.message.reply_text('أهلاً بك! اختر أحد الخيارات:', reply_markup=reply_markup)
+# عندما يرسل المستخدم "/getemail"
+@bot.message_handler(commands=['getemail'])
+def send_fake_email(message):
+    email = get_fake_email()
+    bot.reply_to(message, f"إيميل وهمي تم إنشاؤه: {email}")
 
-# دالة لتنفيذ الأوامر عند الضغط على الأزرار
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
+# عندما يرسل المستخدم "/getmessages"
+@bot.message_handler(commands=['getmessages'])
+def send_fake_email_messages(message):
+    try:
+        # قم بجلب الإيميل الوهمي
+        email = get_fake_email()
 
-    if query.data == 'get_email':
-        email = get_temp_email()
-        if email:
-            context.user_data['email'] = email  # تخزين الإيميل للاستخدام لاحقًا
-            await query.edit_message_text(f"تم إنشاء إيميل وهمي: {email}")
+        # جلب الرسائل الواردة على الإيميل
+        messages = get_messages_from_email(email)
+
+        if messages:
+            for msg in messages:
+                bot.reply_to(message, f"رسالة جديدة: \nالموضوع: {msg['subject']}\nالمرسل: {msg['from']}\nالمحتوى: {msg['textBody']}")
         else:
-            await query.edit_message_text("فشل في جلب الإيميل الوهمي.")
-    
-    elif query.data == 'get_inbox':
-        email = context.user_data.get('email')
-        if email:
-            inbox = get_inbox(email)
-            if inbox:
-                message_list = "\n".join([message['message'] for message in inbox])
-                await query.edit_message_text(f"الرسائل الواردة:\n{message_list}")
-            else:
-                await query.edit_message_text("لا توجد رسائل واردة بعد.")
-        else:
-            await query.edit_message_text("يرجى جلب الإيميل أولاً باستخدام الزر المخصص.")
-
-# إعداد Webhook
-@app.route(f'/{TELEGRAM_BOT_TOKEN}', methods=['POST'])
-def webhook():
-    update = request.get_json()
-    update = Update.de_json(update, app.bot)
-    app.bot.process_update(update)
-    return 'ok'
+            bot.reply_to(message, "لا توجد رسائل حالياً.")
+    except Exception as e:
+        bot.reply_to(message, f"حدث خطأ: {str(e)}")
 
 # تشغيل البوت
-def main():
-    app.bot = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
-
-    app.bot.add_handler(CommandHandler("start", start))
-    app.bot.add_handler(CallbackQueryHandler(button_handler))
-
-    # تشغيل Webhook
-    app.bot.run_webhook(listen="0.0.0.0",
-                        port=int(os.environ.get('PORT', 8443)),
-                        url_path=TELEGRAM_BOT_TOKEN,
-                        webhook_url=f"https://YOUR_WEBHOOK_URL/{TELEGRAM_BOT_TOKEN}")
-
-if __name__ == '__main__':
-    main()
-    app.run(port=int(os.environ.get('PORT', 8443)))
-    
+bot.infinity_polling()
