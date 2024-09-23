@@ -64,15 +64,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("يرجى جلب الإيميل أولاً باستخدام الزر المخصص.")
 
 # تشغيل البوت
-async def main():
+def main():
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
 
-    await app.run_polling()  # استخدم run_polling() بدلاً من start_polling
-    await app.idle()
+    app.run_polling()  # استخدم run_polling() بدون asyncio.run
 
 if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+    main()
