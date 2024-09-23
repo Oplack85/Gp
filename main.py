@@ -53,9 +53,9 @@ def check_for_new_messages(chat_id, email):
                     body = full_message.get('textBody')
                     if not body:
                         body = full_message.get('htmlBody', '✎┊‌ الرسالة فارغه')
-                        if body != '✎┊‌ الرسالة فارغه ':
+                        if body != '✎┊‌ الرسالة فارغه':
                             body = html_to_text(body)
-
+                    
                     bot.send_message(chat_id, body)  # إرسال محتوى الرسالة فقط
                     user_messages[chat_id].append(message_id)
         time.sleep(10)  # الانتظار لمدة 10 ثوانٍ قبل التحقق مرة أخرى
@@ -63,22 +63,22 @@ def check_for_new_messages(chat_id, email):
 # عند بدء المحادثة مع البوت
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-
-    markup = types.InlineKeyboardMarkup()
-    subscribe_button = types.InlineKeyboardButton("𝗦𝗰𝗼𝗿𝗽𝗶𝗼𝗻 𝗖𝗵𝗮𝗻𝗻𝗲𝗹 ✍🏻", url="https://t.me/Scorpion_scorp")
-    markup.add(subscribe_button)
-    
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     button_email = types.KeyboardButton("إنشاء إيميل")
+    subscribe_button = types.InlineKeyboardButton("اشترك في القتاة", url="https://t.me/Scorpion_scorp")
+    
     markup.add(button_email)
-    bot.send_message(message.chat.id, "*✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهمية*\n*الخاص بسورس العقرب ✓*\n\n*فقط اضغط على الزر أدناه لإنشاء إيميل 😁* \n\n تم تطوير البوت بواسطة : \nالمطور [𝗠𝗼𝗵𝗮𝗺𝗲𝗱](t.me/Zo_r0) \nالمطور [𝗔𝗹𝗹𝗼𝘂𝘀𝗵](t.me/I_e_e_l)", reply_markup=markup, parse_mode='Markdown', disable_web_page_preview=True)
+    markup.add(subscribe_button)  # إضافة زر الاشتراك إلى قائمة الأزرار
+
+    bot.send_message(message.chat.id, "[𝗦𝗖 𝗙𝗮𝗸𝗲 𝗠𝗮𝗶𝗟 📮](https://t.me/Scorpion_scorp)\n\n*✎┊‌ مرحبا بك عزيزي في بوت الايميلات الوهمية 👋🏻*\n\n*للحصول على ايميل اضغط على انشاء ايميل فقط ✍🏻* \n\n تم تطوير البوت بواسطة : \nالمطور [𝗠𝗼𝗵𝗮𝗺𝗲𝗱](t.me/Zo_r0) \nالمطور [𝗔𝗹𝗹𝗼𝘂𝘀𝗵](t.me/I_e_e_l)", reply_markup=markup, parse_mode='Markdown', disable_web_page_preview=True)
+
 # عند الضغط على زر إنشاء إيميل
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
 def send_fake_email(message):
     email = get_fake_email()
     user_emails[message.chat.id] = email  # تخزين الإيميل للمستخدم
     bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه ✅\n\nإضغط للنسخ [* `{email}` *]\n\n✎┊‌ عزيزي اي طلب او رسالة تجي عل ايميل راح تندز مباشرة مراح تحتاج جلب رسالة وغيرها *", parse_mode='Markdown')
-    
+
     # بدء عملية مراقبة الرسائل في صندوق الوارد
     email_thread = threading.Thread(target=check_for_new_messages, args=(message.chat.id, email))
     email_thread.daemon = True
@@ -86,4 +86,3 @@ def send_fake_email(message):
 
 # تشغيل البوت
 bot.infinity_polling()
-                
