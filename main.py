@@ -5,7 +5,7 @@ import threading
 from bs4 import BeautifulSoup
 
 # ضع هنا التوكن الخاص بالبوت
-API_TOKEN = '7218686976:AAHKUWhhQFNIPfr12Yg0v08g7bti8OPdXsA'
+API_TOKEN = 'YOUR_TELEGRAM_BOT_API_TOKEN'
 
 # إنشاء البوت باستخدام التوكن
 bot = telebot.TeleBot(API_TOKEN)
@@ -27,6 +27,12 @@ def get_messages_from_email(email):
     response = requests.get(f'https://www.1secmail.com/api/v1/?action=getMessages&login={user}&domain={domain}')
     return response.json()
 
+# دالة لجلب محتوى رسالة معينة من ID
+def get_message_content(email, message_id):
+    user, domain = email.split('@')
+    response = requests.get(f'https://www.1secmail.com/api/v1/?action=readMessage&login={user}&domain={domain}&id={message_id}')
+    return response.json()
+
 # دالة لتحويل HTML إلى نص عادي
 def html_to_text(html):
     soup = BeautifulSoup(html, "html.parser")
@@ -46,15 +52,19 @@ def check_for_new_messages(chat_id, email):
                     subject = msg.get('subject', 'لا يوجد موضوع')
                     sender = msg.get('from', 'غير معروف')
                     
-                    # عرض محتويات الرسالة بالكامل للتأكد
-                    print(f"Received message data: {msg}")
-
+                    # جلب محتويات الرسالة بالتفصيل باستخدام ID الرسالة
+                    full_message = get_message_content(email, message_id)
+                    
+                    # عرض محتويات الرسالة كاملة في logs لفحص الحقول
+                    print(f"Full message content: {full_message}")
+                    
                     # محاولة جلب النص العادي أو استخدام HTML إذا لم يكن النص متاحًا
-                    body = msg.get('textBody')
+                    body = full_message.get('textBody')
                     if not body:  # إذا لم يكن هناك نص عادي، نستخدم htmlBody
-                        body = msg.get('htmlBody', 'المحتوى غير متاح')
-                        # تحويل HTML إلى نص عادي
-                        body = html_to_text(body)
+                        body = full_message.get('htmlBody', 'المحتوى غير متاح')
+                        # تحويل HTML إلى نص عادي إذا كان متاحاً
+                        if body != 'المحتوى غير متاح':
+                            body = html_to_text(body)
 
                     bot.send_message(chat_id, f"رسالة جديدة:\nالموضوع: {subject}\nالمرسل: {sender}\nالمحتوى: {body}")
                     # حفظ معرف الرسالة لتجنب التكرار
