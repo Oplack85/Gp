@@ -1,9 +1,9 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import sqlite3
 
 # دالة لإنشاء قاعدة البيانات
-def create_db(update: Update, context: CallbackContext):
+async def create_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn = sqlite3.connect('mydatabase.db')
     cursor = conn.cursor()
     
@@ -18,18 +18,15 @@ def create_db(update: Update, context: CallbackContext):
     conn.commit()
     conn.close()
     
-    update.message.reply_text("تم إنشاء قاعدة البيانات والجدول بنجاح!")
+    await update.message.reply_text("تم إنشاء قاعدة البيانات والجدول بنجاح!")
 
 # إعداد البوت
 def main():
-    updater = Updater("YOUR_TOKEN", use_context=True)
-    dp = updater.dispatcher
+    app = ApplicationBuilder().token("7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc").build()
 
-    dp.add_handler(CommandHandler("create_db", create_db))
+    app.add_handler(CommandHandler("create_db", create_db))
 
-    updater.start_polling()
-    updater.idle()
+    app.run_polling()
 
 if __name__ == '__main__':
     main()
-    
