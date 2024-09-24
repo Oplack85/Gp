@@ -76,7 +76,7 @@ def show_email_list(message):
     emails = user_email_list.get(chat_id, [])
     if emails:
         email_list_str = "\n".join([f"{i+1}. {email}" for i, email in enumerate(emails)])
-        bot.send_message(chat_id, f"*✎┊‌ قائمة الإيميلات 📬 *\n\n*{email_list_str}*\n\n*✎┊‌ اذا اردت حذف احد الايميلات ارسل* \n [ `\delete_email` ] + *رقم الايميل* ", parse_mode='Markdown')
+        bot.send_message(chat_id, f"*✎┊‌ قائمة الإيميلات 📬 *\n\n{email_list_str}\n\n✎┊‌ اذا اردت حذف احد الايميلات ارسل \n [`\delete_email`] + رقم الايميل ", parse_mode='Markdown')
     else:
         bot.send_message(chat_id, "*✎┊‌ لا توجد إيميلات تم إنشاؤها بعد.*", parse_mode='Markdown')
 
@@ -99,23 +99,23 @@ def delete_email(message):
         else:
             bot.send_message(chat_id, "*✎┊‌ رقم الإيميل غير صحيح.*", parse_mode='Markdown')
     except (IndexError, ValueError):
-        bot.send_message(chat_id, "*✎┊‌ يرجى إدخال رقم الإيميل الصحيح بعد الأمر.*\n\n*- مثال: \n*` /delete_email 1 `", parse_mode='Markdown')
+        bot.send_message(chat_id, "*✎┊‌ يرجى إدخال رقم الإيميل الصحيح بعد الأمر.*\n\n*- مثال: \n*`/delete_email 1`", parse_mode='Markdown')
 
 # عند الضغط على زر إنشاء إيميل
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
 def send_fake_email(message):
     chat_id = message.chat.id
-    loading_message = bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 10%**\n\n[ ▀▀────────────────── ]")
+    loading_message = bot.send_message(chat_id, "*✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 10%*\n\n[ ▀▀────────────────── ]")
 
     for percent in range(20, 101, 10):
         time.sleep(1)
-        progress_bar = "▀" * (percent // 10) + "─" * (10 - percent // 10)
+        progress_bar = "▀" * 2 + "─" * (10 - percent // 10)
         bot.edit_message_text(
-            text=f"**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | {percent}%**\n\n[ {progress_bar} ]",
+            text=f"*✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | {percent}%*\n\n[ {progress_bar} ]",
             chat_id=chat_id,
             message_id=loading_message.message_id
         )
-
+    bot.delete_message(chat_id, loading_message.message_id)
     email = get_fake_email()
     user_emails[chat_id] = email
     if chat_id not in user_email_list:
@@ -123,10 +123,11 @@ def send_fake_email(message):
     user_email_list[chat_id].append(email)
     bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه ✅\n\nإضغط للنسخ [* `{email}` *]*", parse_mode='Markdown')
 
+    
     email_thread = threading.Thread(target=check_for_new_messages, args=(chat_id, email))
     email_thread.daemon = True
     email_thread.start()
 
 # تشغيل البوت
 bot.infinity_polling()
-    
+                     
