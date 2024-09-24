@@ -121,8 +121,7 @@ def send_fake_email(message):
     if chat_id not in user_email_list:
         user_email_list[chat_id] = []
     user_email_list[chat_id].append(email)
-    bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه ✅\n\nإضغط للنسخ [* `{email}` *]*", parse_mode='Markdown')
-
+    bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه ✅\n\nإضغط للنسخ [* `{email}` *]\n\n✎┊‌ عزيزي اي طلب او رسالة تجي عل ايميل راح تندز مباشرة مراح تحتاج جلب رسالة وغيرها *", parse_mode='Markdown')
     
     email_thread = threading.Thread(target=check_for_new_messages, args=(chat_id, email))
     email_thread.daemon = True
