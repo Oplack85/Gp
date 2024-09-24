@@ -3,7 +3,8 @@ import uuid
 from telethon import TelegramClient
 from telethon import events
 from telethon import Button
-
+import subprocess
+from random import choices, randint
 api_id = 23970174  # استبدل بـ API ID الخاص بك
 api_hash = 'f1db2e38b2c73448ef09c504187e888d'  # استبدل بـ API Hash الخاص بك
 bot_token = '7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc'  # استبدل بـ توكن البوت الخاص بك
