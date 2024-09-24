@@ -105,15 +105,16 @@ def delete_email(message):
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
 def send_fake_email(message):
     chat_id = message.chat.id
-    loading_message = bot.send_message(chat_id, "*✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 10%*\n\n[ ▀▀────────────────── ]")
+    loading_message = bot.send_message(chat_id, "*✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 10%*\n\n[ ▀▀────────────────── ]", parse_mode='Markdown')
 
     for percent in range(20, 101, 10):
         time.sleep(1)
-        progress_bar = "▀" * 2 + "─" * (10 - percent // 10)
+        progress_bar = "▀▀" * (percent // 10) + "──" * (10 - percent // 10)
         bot.edit_message_text(
             text=f"*✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | {percent}%*\n\n[ {progress_bar} ]",
             chat_id=chat_id,
-            message_id=loading_message.message_id
+            message_id=loading_message.message_id,
+            parse_mode='Markdown'
         )
     bot.delete_message(chat_id, loading_message.message_id)
     email = get_fake_email()
@@ -129,4 +130,3 @@ def send_fake_email(message):
 
 # تشغيل البوت
 bot.infinity_polling()
-                     
