@@ -22,7 +22,7 @@ def create_db(update: Update, context: CallbackContext):
 
 # إعداد البوت
 def main():
-    updater = Updater("7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc", use_context=True)
+    updater = Updater("YOUR_TOKEN", use_context=True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("create_db", create_db))
@@ -32,3 +32,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
