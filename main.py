@@ -78,7 +78,7 @@ def show_email_list(message):
     emails = user_email_list.get(chat_id, [])
     if emails:
         email_list_str = "\n".join([f"{i+1}. {email}" for i, email in enumerate(emails)])
-        bot.send_message(chat_id, f"*✎┊‌ قائمة الإيميلات:*\n\n{email_list_str}", parse_mode='Markdown')
+        bot.send_message(chat_id, f"*✎┊‌ قائمة الإيميلات 📬 *\n\n{email_list_str}\n\n✎┊‌ اذا اردت حذف احد الايميلات ارسل \n [`\delete_email`] + رقم الايميل ", parse_mode='Markdown')
     else:
         bot.send_message(chat_id, "*✎┊‌ لا توجد إيميلات تم إنشاؤها بعد.*", parse_mode='Markdown')
 
@@ -98,11 +98,11 @@ def delete_email(message):
         if 0 <= email_number < len(emails):
             deleted_email = emails.pop(email_number)
             user_email_list[chat_id] = emails  # تحديث القائمة
-            bot.send_message(chat_id, f"*✎┊‌ تم حذف الإيميل: {deleted_email}* ✅", parse_mode='Markdown')
+            bot.send_message(chat_id, f"*✎┊‌ تم حذف الإيميل ✅ \n [ {deleted_email} ]*", parse_mode='Markdown')
         else:
             bot.send_message(chat_id, "*✎┊‌ رقم الإيميل غير صحيح.*", parse_mode='Markdown')
     except (IndexError, ValueError):
-        bot.send_message(chat_id, "*✎┊‌ يرجى إدخال رقم الإيميل الصحيح بعد الأمر.*\n*مثال: *`/delete_email 1`", parse_mode='Markdown')
+        bot.send_message(chat_id, "*✎┊‌ يرجى إدخال رقم الإيميل الصحيح بعد الأمر.*\n\n*- مثال: \n*`/delete_email 1`", parse_mode='Markdown')
 
 # عند الضغط على زر إنشاء إيميل
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
