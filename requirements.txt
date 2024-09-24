@@ -1,3 +1,1 @@
 telethon
-subprocess
-random
