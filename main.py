@@ -17,7 +17,7 @@ def create_db_connection():
         dbname="data_cbun",  # استبدل باسم قاعدة البيانات
         user="data_cbun_user",    # استبدل باسم المستخدم
         password="vONvqIraGuQdH2OZQaGrHYzUHoLPTlP6", # استبدل بكلمة المرور
-        host="dpg82",        # استبدل بعنوان المضيف
+        host="0.0.0.0",        # استبدل بعنوان المضيف
         port="5432"              # عادةً ما يكون 5432
     )
 
