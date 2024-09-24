@@ -78,7 +78,7 @@ def show_email_list(message):
     emails = user_email_list.get(chat_id, [])
     if emails:
         email_list_str = "\n".join([f"{i+1}. {email}" for i, email in enumerate(emails)])
-        bot.send_message(chat_id, f"*✎┊‌ قائمة الإيميلات:*\n\n {email_list_str}", parse_mode='Markdown')
+        bot.send_message(chat_id, f"*✎┊‌ قائمة الإيميلات:*\n\n{email_list_str}", parse_mode='Markdown')
     else:
         bot.send_message(chat_id, "*✎┊‌ لا توجد إيميلات تم إنشاؤها بعد.*", parse_mode='Markdown')
 
