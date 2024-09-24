@@ -11,11 +11,9 @@ API_TOKEN = '7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc'
 # إنشاء البوت باستخدام التوكن
 bot = telebot.TeleBot(API_TOKEN)
 
-# متغير لتخزين الإيميل الوهمي لكل مستخدم
+# متغيرات لتخزين المعلومات
 user_emails = {}
-# متغير لتخزين الرسائل المستلمة لكل مستخدم لمنع التكرار
 user_messages = {}
-# متغير لتخزين قائمة الإيميلات لكل مستخدم
 user_email_list = {}
 
 # دالة لجلب إيميل وهمي من 1secmail
@@ -57,10 +55,10 @@ def check_for_new_messages(chat_id, email):
                         body = full_message.get('htmlBody', '✎┊‌ الرسالة فارغه')
                         if body != '✎┊‌ الرسالة فارغه':
                             body = html_to_text(body)
-                    
-                    bot.send_message(chat_id, body)  # إرسال محتوى الرسالة فقط
+
+                    bot.send_message(chat_id, body)
                     user_messages[chat_id].append(message_id)
-        time.sleep(10)  # الانتظار لمدة 10 ثوانٍ قبل التحقق مرة أخرى
+        time.sleep(10)
 
 # عند بدء المحادثة مع البوت
 @bot.message_handler(commands=['start'])
@@ -69,7 +67,7 @@ def send_welcome(message):
     button_email = types.KeyboardButton("إنشاء إيميل")
     button_list_emails = types.KeyboardButton("عرض الإيميلات")
     markup.add(button_email, button_list_emails)
-    bot.send_message(message.chat.id, "[𝗦𝗖 𝗙𝗮𝗸𝗲 𝗠𝗮𝗶𝗟 📮](https://t.me/Scorpion_scorp)\n\n*✎┊‌ مرحبا بك في بوت الايميلات الوهمية 👋🏻*\n\n*للحصول على ايميل اضغط على انشاء ايميل ✍🏻* \n\n* تم تطوير البوت بواسطة :* \n*المطور* [𝗠𝗼𝗵𝗮𝗺𝗲𝗱](t.me/Zo_r0) \n*المطور* [𝗔𝗹𝗹𝗼𝘂𝘀𝗵](t.me/I_e_e_l)", reply_markup=markup, parse_mode='Markdown', disable_web_page_preview=True)
+    bot.send_message(message.chat.id, "[𝗦𝗖 𝗙𝗮𝗸𝗲 𝗠𝗮𝗶𝗹 📮](https://t.me/Scorpion_scorp)\n\n*✎┊‌ مرحبا بك في بوت الايميلات الوهمية 👋🏻*\n\n*للحصول على ايميل اضغط على انشاء ايميل ✍🏻* \n\n* تم تطوير البوت بواسطة :* \n*المطور* [𝗠𝗼𝗵𝗮𝗺𝗲𝗱](t.me/Zo_r0) \n*المطور* [𝗔𝗹𝗹𝗼𝘂𝘀𝗵](t.me/I_e_e_l)", reply_markup=markup, parse_mode='Markdown', disable_web_page_preview=True)
 
 # عرض قائمة الإيميلات
 @bot.message_handler(func=lambda message: message.text == "عرض الإيميلات")
@@ -93,11 +91,10 @@ def delete_email(message):
         return
 
     try:
-        # طلب رقم الإيميل المراد حذفه
         email_number = int(message.text.split()[1]) - 1
         if 0 <= email_number < len(emails):
             deleted_email = emails.pop(email_number)
-            user_email_list[chat_id] = emails  # تحديث القائمة
+            user_email_list[chat_id] = emails
             bot.send_message(chat_id, f"*✎┊‌ تم حذف الإيميل ✅ \n [ {deleted_email} ]*", parse_mode='Markdown')
         else:
             bot.send_message(chat_id, "*✎┊‌ رقم الإيميل غير صحيح.*", parse_mode='Markdown')
@@ -107,15 +104,35 @@ def delete_email(message):
 # عند الضغط على زر إنشاء إيميل
 @bot.message_handler(func=lambda message: message.text == "إنشاء إيميل")
 def send_fake_email(message):
-    email = get_fake_email()
     chat_id = message.chat.id
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 10%**\n\n[ ▀▀────────────────── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 20%**\n\n[ ▀▀▀▀──────────────── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 30%**\n\n[ ▀▀▀▀▀▀────────────── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 40%**\n\n[ ▀▀▀▀▀▀▀▀──────────── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 50%**\n\n[ ▀▀▀▀▀▀▀▀▀▀────────── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 60%**\n\n[ ▀▀▀▀▀▀▀▀▀▀▀▀──────── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 70%**\n\n[ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀────── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 80%**\n\n[ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀──── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 90%**\n\n[ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀── ]")
+    time.sleep(1)
+    bot.send_message(chat_id, "**✎┊‌ 𝗚𝗲𝘁𝘁𝗶𝗻𝗴 𝗲𝗺𝗮𝗶𝗹 📥  | 100%**\n\n[ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ]")
+    time.sleep(1)
+
+    email = get_fake_email()
     user_emails[chat_id] = email
     if chat_id not in user_email_list:
         user_email_list[chat_id] = []
-    user_email_list[chat_id].append(email)  # إضافة الإيميل للقائمة
-    bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه ✅\n\nإضغط للنسخ [* `{email}` *]\n\n✎┊‌ عزيزي اي طلب او رسالة تجي عل ايميل راح تندز مباشرة مراح تحتاج جلب رسالة وغيرها *", parse_mode='Markdown')
+    user_email_list[chat_id].append(email)
+    bot.reply_to(message, f"*✎┊‌ إيميل وهمي تم إنشاؤه ✅\n\nإضغط للنسخ [* `{email}` *]*", parse_mode='Markdown')
 
-    # بدء عملية مراقبة الرسائل في صندوق الوارد
     email_thread = threading.Thread(target=check_for_new_messages, args=(chat_id, email))
     email_thread.daemon = True
     email_thread.start()
