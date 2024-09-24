@@ -32,7 +32,7 @@ async def create_db(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         conn.close()
 
 def main() -> None:
-    app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
+    app = ApplicationBuilder().token("7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc").build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("create_db", create_db))
