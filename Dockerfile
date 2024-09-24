@@ -9,10 +9,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # نسخ السكربت الخاص بك
-COPY start.sh .
+WORKDIR /app
 
-# إعطاء الأذونات اللازمة للسكربت
-RUN chmod +x start.sh
+COPY main.py /app
 
-# الأمر الذي يتم تنفيذه عند تشغيل الحاوية
-CMD ["bash", "start.sh"]
+CMD ["python", "main.py"]
