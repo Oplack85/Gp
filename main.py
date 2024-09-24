@@ -116,6 +116,7 @@ def send_fake_email(message):
             message_id=loading_message.message_id,
             parse_mode='Markdown'
         )
+    time.sleep(1)
     bot.delete_message(chat_id, loading_message.message_id)
     email = get_fake_email()
     user_emails[chat_id] = email
