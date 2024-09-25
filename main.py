@@ -1,60 +1,52 @@
-import psycopg2
-import uuid
-from telethon import TelegramClient
-from telethon import events
-from telethon import Button
+import random
+import string
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
 import subprocess
-from random import choices, randint
-api_id = 23970174  # استبدل بـ API ID الخاص بك
-api_hash = 'f1db2e38b2c73448ef09c504187e888d'  # استبدل بـ API Hash الخاص بك
-bot_token = '7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc'  # استبدل بـ توكن البوت الخاص بك
 
-Hussein = TelegramClient('aljoker_session', api_id, api_hash).start(bot_token=bot_token)
+def run_command(command: str) -> str:
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return result.stdout + result.stderr
 
-# إعداد الاتصال بقاعدة البيانات
-def create_db_connection():
-    return psycopg2.connect(
-        dbname="data_cbun",  # استبدل باسم قاعدة البيانات
-        user="data_cbun_user",    # استبدل باسم المستخدم
-        password="vONvqIraGuQdH2OZQaGrHYzUHoLPTlP6", # استبدل بكلمة المرور
-        host="0.0.0.0",        # استبدل بعنوان المضيف
-        port="5432"              # عادةً ما يكون 5432
-    )
+def generate_random_string(length: int) -> str:
+    letters = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters) for i in range(length))
 
-@Hussein.on(events.NewMessage(pattern='/start'))
-async def aljoker(event):
-    keyboard = [[Button.inline('إنشاء قاعدة بيانات', b'aljoker_postgres')]]
-    await event.reply(
-        f'''**اهلاً وسهلاً حبيبي {event.sender.first_name}،
-‎لإنشاء قاعدة بيانات خاصة بسورس الجوكر قم بالضغط على زر إنشاء قاعدة بيانات**''',
-        buttons=keyboard
-    )
+def setup(update: Update, context: CallbackContext) -> None:
+    user = generate_random_string(8)       # توليد اسم مستخدم عشوائي
+    password = generate_random_string(12)   # توليد كلمة مرور عشوائية
+    database = generate_random_string(10)   # توليد اسم قاعدة بيانات عشوائية
+    db_file = generate_random_string(8)     # توليد اسم ملف قاعدة بيانات عشوائي
+    db_folder = generate_random_string(10)   # توليد اسم مجلد عشوائي
 
-@Hussein.on(events.CallbackQuery)
-async def handle_callback(event):
-    if event.data == b'aljoker_postgres':
-        OHussein = ''.join(choices('abcdefghijklmnopqrstuvwxyz0123456789', k=randint(5, 10)))
-        await event.respond('**᯽︙ انتظرني أسوي لك قاعدة بيانات لعيونك🥰**')
+    commands = [
+        f"mkdir -p $PREFIX/var/lib/postgresql/{db_folder}",  # مجلد عشوائي
+        f"initdb $PREFIX/var/lib/postgresql/{db_folder}",     # تهيئة قاعدة البيانات
+        f"pg_ctl -D $PREFIX/var/lib/postgresql/{db_folder} start",  # بدء قاعدة البيانات
+        f"createuser --superuser {user}",
+        f"psql -U postgres -d postgres -c \"ALTER USER {user} WITH PASSWORD '{password}';\"",
+        f"psql -U postgres -d postgres -c \"CREATE DATABASE {database} OWNER {user};\"",
+        f"pg_dump {database} > $PREFIX/var/lib/postgresql/{db_folder}/{db_file}.sql",  # تصدير قاعدة البيانات إلى ملف
+        f"pg_ctl -D $PREFIX/var/lib/postgresql/{db_folder} status"
+    ]
+    
+    responses = []
+    for command in commands:
+        response = run_command(command)
+        responses.append(response)
 
-        try:
-            conn = create_db_connection()
-            cursor = conn.cursor()
+    # إعداد تفاصيل الاتصال بقاعدة البيانات
+    connection_string = f"postgresql://{user}:{password}@localhost:5432/{database}"
+    
+    update.message.reply_text(f"Connection String: {connection_string}\n\nResponses:\n" + "\n".join(responses))
 
-            # إنشاء المستخدم
-            create_user_query = f"CREATE USER joker{OHussein} WITH PASSWORD 'joker{OHussein}';"
-            cursor.execute(create_user_query)
+def main():
+    updater = Updater("7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc")
 
-            # إنشاء قاعدة البيانات
-            create_db_query = f"CREATE DATABASE joker{OHussein} OWNER joker{OHussein};"
-            cursor.execute(create_db_query)
+    updater.dispatcher.add_handler(CommandHandler("setup", setup))
 
-            conn.commit()
-            await event.respond(f'''**وهاي قاعدة البيانات وتدلل علينا 😘 : `postgresql://joker{OHussein}:joker{OHussein}@{your_host}:5432/joker{OHussein}`**''')
-        except Exception as e:
-            await event.respond(f'حدث خطأ أثناء إنشاء المستخدم أو قاعدة البيانات:\n{str(e)}')
-        finally:
-            cursor.close()
-            conn.close()
+    updater.start_polling()
+    updater.idle()
 
-print("البوت يشتغل استمتع 😍...")
-Hussein.run_until_disconnected()
+if __name__ == '__main__':
+    main()
