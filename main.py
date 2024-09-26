@@ -1,11 +1,12 @@
 import os
 import random
-import logging
+import subprocess
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-DB_DIR = os.path.join(os.environ['PREFIX'], 'var/lib/db_files')
-OUTPUT_FILE = "/storage/emulated/0/db_details.txt"
+# استخدم مسارًا مخصصًا في Render
+DB_DIR = '/app/db_files'  # مسار قاعدة البيانات
+OUTPUT_FILE = '/app/db_details.txt'  # مسار ملف التفاصيل
 
 def start_database():
     os.makedirs(DB_DIR, exist_ok=True)
@@ -35,7 +36,7 @@ async def create_databases(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await update.message.reply_text(f"5 new databases have been created. Check the details in the file: {OUTPUT_FILE}")
 
 async def main() -> None:
-    application = ApplicationBuilder().token("7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc").build()
+    application = ApplicationBuilder().token("YOUR_TOKEN").build()
 
     application.add_handler(CommandHandler("data", create_databases))
 
