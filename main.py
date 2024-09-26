@@ -35,19 +35,19 @@ async def receive_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             
             # تحويل القائمة إلى نص لإرسالها دفعة واحدة
             copies_text = "\n".join(copies)
-            await update.message.reply_text(f'*✎┊‌ تم إنشاء النسخ التالية:*\n\n{copies_text}', parse_mode='MarkdownV2')
+            await update.message.reply_text(f'*✎┊‌ تم إنشاء النسخ التالية:*\n\n{copies_text}\n\n[• 𝗦𝗰𝗼𝗿𝗽𝗶𝗼𝗻](t.me/Scorpion_scorp)', parse_mode='MarkdownV2')
         else:
-            await update.message.reply_text('*✎┊‌ يرجى إدخال رقم بين 1 و 1000.*', parse_mode='MarkdownV2')
+            await update.message.reply_text('*✎┊‌ يرجى إدخال رقم بين 1 و 1000 *', parse_mode='MarkdownV2')
             return NUMBER
 
     except ValueError:
-        await update.message.reply_text('*✎┊‌ يرجى إدخال عدد صحيح.*', parse_mode='MarkdownV2')
+        await update.message.reply_text('*✎┊‌ يرجى إدخال عدد صحيح *', parse_mode='MarkdownV2')
         return NUMBER
 
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text('*تم إلغاء العملية.*', parse_mode='MarkdownV2')
+    await update.message.reply_text('*✎┊‌ تم إلغاء العملية *', parse_mode='MarkdownV2')
     return ConversationHandler.END
 
 def main():
