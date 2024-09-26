@@ -33,9 +33,11 @@ async def receive_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             original_email = context.user_data['original_email']
             copies = [f"{original_email.split('@')[0]}{i}@{original_email.split('@')[1]}" for i in range(1, num_copies + 1)]
             
-            # تحويل القائمة إلى نص لإرسالها دفعة واحدة
-            copies_text = "\n".join(copies)
-            await update.message.reply_text(f'✎┊‌ تم إنشاء النسخ التالية:\n\n{copies_text}')
+            # تقسيم النسخ إلى مجموعات وإرسال كل مجموعة في رسالة منفصلة
+            chunk_size = 150  # عدد النسخ في كل رسالة
+            for i in range(0, len(copies), chunk_size):
+                copies_text = "\n".join(copies[i:i + chunk_size])
+                await update.message.reply_text(f'✎┊‌ تم إنشاء النسخ التالية:\n\n{copies_text}')
         else:
             await update.message.reply_text('✎┊‌ يرجى إدخال رقم بين 1 و 1000.')
             return NUMBER
@@ -75,4 +77,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-                         
