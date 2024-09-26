@@ -3,31 +3,46 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, ConversationHandler, MessageHandler, filters
 
 # حالات المحادثة
-EMAIL = range(1)
+EMAIL, NUMBER = range(2)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("استنساخ البريد", callback_data='clone_email')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text('اضغط على الزر لاستنساخ البريد:', reply_markup=reply_markup)
+    await update.message.reply_text('✎┊‌ اضغط على الزر لاستنساخ البريد:', reply_markup=reply_markup)
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
     
     if query.data == 'clone_email':
-        await query.edit_message_text(text='يرجى إدخال البريد الإلكتروني الذي تريد استنساخه:')
+        await query.edit_message_text(text='✎┊‌ يرجى إدخال البريد الإلكتروني الذي تريد استنساخه:')
         return EMAIL
 
 async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     original_email = update.message.text
-    copies = [f"{original_email.split('@')[0]}+{i}@{original_email.split('@')[1]}" for i in range(1, 51)]
-    
-    # هنا يمكنك تنفيذ أي منطق إضافي لجعل كل نسخة تعمل بشكل مستقل
-    for copy in copies:
-        # يمكنك إجراء عملية إضافية مع كل نسخة، مثل إرسالها إلى واجهة برمجة تطبيقات أو قاعدة بيانات
-        await update.message.reply_text(f'تم إنشاء النسخة: {copy}')
+    await update.message.reply_text('✎┊‌ يرجى إدخال عدد النسخ (حد أقصى 1000):')
+    context.user_data['original_email'] = original_email
+    return NUMBER
+
+async def receive_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    try:
+        num_copies = int(update.message.text)
+        if 1 <= num_copies <= 1000:
+            original_email = context.user_data['original_email']
+            copies = [f"{original_email.split('@')[0]}{i}@{original_email.split('@')[1]}" for i in range(1, num_copies + 1)]
+            
+            # تحويل القائمة إلى نص لإرسالها دفعة واحدة
+            copies_text = "\n".join(copies)
+            await update.message.reply_text(f'✎┊‌ تم إنشاء النسخ التالية:\n\n{copies_text}')
+        else:
+            await update.message.reply_text('✎┊‌ يرجى إدخال رقم بين 1 و 1000.')
+            return NUMBER
+
+    except ValueError:
+        await update.message.reply_text('✎┊‌ يرجى إدخال عدد صحيح.')
+        return NUMBER
 
     return ConversationHandler.END
 
@@ -46,6 +61,7 @@ def main():
         entry_points=[CallbackQueryHandler(button)],
         states={
             EMAIL: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_email)],
+            NUMBER: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_number)],
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
@@ -59,3 +75,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+                         
