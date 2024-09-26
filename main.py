@@ -10,19 +10,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton("استنساخ البريد", callback_data='clone_email')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text('*[𝗖𝗽 𝗠𝗮𝗶𝗹 📬](t.me/Scorpion_scorp)\n\n✎┊‌ مرحبا بك في بوت استنساخ الايميلات 📧 \n\n✎┊‌ اضغط على الزر ادناه وٱتبع الخطوات ⬇️*', reply_markup=reply_markup, parse_mode='MarkdownV2', disable_web_page_preview=True)
-    
+    await update.message.reply_text('*[𝗖𝗽 𝗠𝗮𝗶𝗹 📬](t.me/Scorpion_scorp)\n\n*✎┊‌ مرحبا بك في بوت استنساخ الايميلات 📧*\n\n*✎┊‌ اضغط على الزر ادناه وٱتبع الخطوات ⬇️*', reply_markup=reply_markup, parse_mode='MarkdownV2', disable_web_page_preview=True)
+
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
     
     if query.data == 'clone_email':
-        await query.edit_message_text(text='✎┊‌ يرجى إدخال البريد الإلكتروني الذي تريد استنساخه:')
+        await query.edit_message_text(text='*✎┊‌ يرجى إدخال البريد الإلكتروني الذي تريد استنساخه:*', parse_mode='MarkdownV2')
         return EMAIL
 
 async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     original_email = update.message.text
-    await update.message.reply_text('✎┊‌ يرجى إدخال عدد النسخ (حد أقصى 1000):')
+    await update.message.reply_text('*✎┊‌ يرجى إدخال عدد النسخ (حد أقصى 1000):*', parse_mode='MarkdownV2')
     context.user_data['original_email'] = original_email
     return NUMBER
 
@@ -31,25 +31,25 @@ async def receive_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         num_copies = int(update.message.text)
         if 1 <= num_copies <= 1000:
             original_email = context.user_data['original_email']
-            copies = [f"{i}) {original_email.split('@')[0]}{i}@{original_email.split('@')[1]}" for i in range(1, num_copies + 1)]
+            copies = [f"{i}) `{original_email.split('@')[0]}{i}@{original_email.split('@')[1]}`" for i in range(1, num_copies + 1)]
             
             # تقسيم النسخ إلى مجموعات وإرسال كل مجموعة في رسالة منفصلة
             chunk_size = 100  # عدد النسخ في كل رسالة
             for i in range(0, len(copies), chunk_size):
                 copies_text = "\n".join(copies[i:i + chunk_size])
-                await update.message.reply_text(f'✎┊‌ تم إنشاء النسخ التالية:\n\n{copies_text}')
+                await update.message.reply_text(f'*✎┊‌ تم إنشاء النسخ التالية *\n\n{copies_text}', parse_mode='MarkdownV2')
         else:
-            await update.message.reply_text('✎┊‌ يرجى إدخال رقم بين 1 و 1000.')
+            await update.message.reply_text('*✎┊‌ يرجى إدخال رقم بين 1 و 1000.*', parse_mode='MarkdownV2')
             return NUMBER
 
     except ValueError:
-        await update.message.reply_text('✎┊‌ يرجى إدخال عدد صحيح.')
+        await update.message.reply_text('*✎┊‌ يرجى إدخال عدد صحيح.*', parse_mode='MarkdownV2')
         return NUMBER
 
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text('تم إلغاء العملية.')
+    await update.message.reply_text('*تم إلغاء العملية.*', parse_mode='MarkdownV2')
     return ConversationHandler.END
 
 def main():
@@ -77,3 +77,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
