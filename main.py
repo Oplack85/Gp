@@ -22,8 +22,13 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     original_email = update.message.text
-    # هنا يمكنك إضافة منطق لنسخ البريد إلى 50 نسخة
-    await update.message.reply_text(f'تم استنساخ البريد: {original_email} إلى 50 نسخة.')
+    copies = [f"{original_email.split('@')[0]}+{i}@{original_email.split('@')[1]}" for i in range(1, 51)]
+    
+    # هنا يمكنك تنفيذ أي منطق إضافي لجعل كل نسخة تعمل بشكل مستقل
+    for copy in copies:
+        # يمكنك إجراء عملية إضافية مع كل نسخة، مثل إرسالها إلى واجهة برمجة تطبيقات أو قاعدة بيانات
+        await update.message.reply_text(f'تم إنشاء النسخة: {copy}')
+
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
