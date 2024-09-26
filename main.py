@@ -1,50 +1,47 @@
+import os
 import random
-import string
+import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import subprocess
 
-def run_command(command: str) -> str:
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    return result.stdout + result.stderr
+DB_DIR = os.path.join(os.environ['PREFIX'], 'var/lib/db_files')
+OUTPUT_FILE = "/storage/emulated/0/db_details.txt"
 
-def generate_random_string(length: int) -> str:
-    letters = string.ascii_letters + string.digits
-    return ''.join(random.choice(letters) for _ in range(length))
+def start_database():
+    os.makedirs(DB_DIR, exist_ok=True)
+    subprocess.run(["initdb", DB_DIR])
+    subprocess.run(["pg_ctl", "-D", DB_DIR, "start"])
 
-async def setup(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user = generate_random_string(8)       # توليد اسم مستخدم عشوائي
-    password = generate_random_string(12)   # توليد كلمة مرور عشوائية
-    database = generate_random_string(10)   # توليد اسم قاعدة بيانات عشوائية
-    db_file = generate_random_string(8)     # توليد اسم ملف قاعدة بيانات عشوائي
-    db_folder = generate_random_string(10)   # توليد اسم مجلد عشوائي
-
-    commands = [
-        f"mkdir -p $PREFIX/var/lib/postgresql/{db_folder}",
-        f"initdb $PREFIX/var/lib/postgresql/{db_folder}",
-        f"pg_ctl -D $PREFIX/var/lib/postgresql/{db_folder} start",
-        f"createuser --superuser {user}",
-        f"psql -U postgres -d postgres -c \"ALTER USER {user} WITH PASSWORD '{password}';\"",
-        f"psql -U postgres -d postgres -c \"CREATE DATABASE {database} OWNER {user};\"",
-        f"pg_dump {database} > $PREFIX/var/lib/postgresql/{db_folder}/{db_file}.sql",
-        f"pg_ctl -D $PREFIX/var/lib/postgresql/{db_folder} status"
-    ]
+async def create_databases(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    start_database()
+    # Clear the previous file if it exists
+    with open(OUTPUT_FILE, 'w') as f:
+        pass
     
-    responses = []
-    for command in commands:
-        response = run_command(command)
-        responses.append(response)
+    for _ in range(5):  # Create 5 databases
+        random_number = random.randint(0, 9999)
+        new_db_name = f"ScorpionDatas{random_number}"
+        new_user = "DataScoR"
+        new_password = f"Scorpass{random_number}"
 
-    connection_string = f"postgresql://{user}:{password}@localhost:5432/{database}"
-    
-    await update.message.reply_text(f"Connection String: {connection_string}\n\nResponses:\n" + "\n".join(responses))
+        # Create the database and user
+        subprocess.run(["psql", "-U", "postgres", "-d", "postgres", "-c", f"CREATE DATABASE {new_db_name} OWNER {new_user};"])
+        subprocess.run(["psql", "-U", "postgres", "-d", "postgres", "-c", f"CREATE USER {new_user} WITH PASSWORD '{new_password}';"])
 
-def main():
+        # Save connection details to the file
+        with open(OUTPUT_FILE, 'a') as f:
+            f.write(f"postgresql://{new_user}:{new_password}@localhost:5432/{new_db_name}\n")
+
+    await update.message.reply_text(f"5 new databases have been created. Check the details in the file: {OUTPUT_FILE}")
+
+async def main() -> None:
     application = ApplicationBuilder().token("7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc").build()
 
-    application.add_handler(CommandHandler("setup", setup))
+    application.add_handler(CommandHandler("data", create_databases))
 
-    application.run_polling()
+    await application.run_polling()
 
 if __name__ == '__main__':
-    main()
+    import asyncio
+    asyncio.run(main())
+    
