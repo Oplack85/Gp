@@ -10,7 +10,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton("استنساخ بريد", callback_data='clone_email')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text('*[𝗖𝗣 𝗠𝗮𝗶𝗹 📬](t.me/Scorpion_scorp)\n\n✎┊‌ مرحبا بك في بوت استنساخ الايميلات 📧 \n\n✎┊‌ اضغط على الزر ادناه وٱتبع الخطوات ⬇️*', reply_markup=reply_markup, parse_mode='MarkdownV2')
+    await update.message.reply_text('*[𝗖𝗽 𝗠𝗮𝗶𝗹 📬](t.me/Scorpion_scorp)\n\n✎┊‌ مرحبا بك في بوت استنساخ الايميلات 📧 \n\n✎┊‌ اضغط على الزر ادناه وٱتبع الخطوات ⬇️*', reply_markup=reply_markup, parse_mode='MarkdownV2', disable_web_page_preview=True)
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -35,7 +35,7 @@ async def receive_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             
             # تحويل القائمة إلى نص لإرسالها دفعة واحدة
             copies_text = "\n".join(copies)
-            await update.message.reply_text(f'*✎┊‌ تم إنشاء النسخ التالية:*\n\n{copies_text}\n\n[• 𝗦𝗰𝗼𝗿𝗽𝗶𝗼𝗻](t.me/Scorpion_scorp)', parse_mode='MarkdownV2')
+            await update.message.reply_text(f'*✎┊‌ تم إنشاء النسخ التالية:*\n\n{copies_text}\n\n[• 𝗦𝗰𝗼𝗿𝗽𝗶𝗼𝗻](t.me/Scorpion_scorp)', parse_mode='MarkdownV2', disable_web_page_preview=True)
         else:
             await update.message.reply_text('*✎┊‌ يرجى إدخال رقم بين 1 و 1000 *', parse_mode='MarkdownV2')
             return NUMBER
@@ -75,4 +75,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
+            
