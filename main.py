@@ -37,7 +37,7 @@ async def receive_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             chunk_size = 100  # عدد النسخ في كل رسالة
             for i in range(0, len(copies), chunk_size):
                 copies_text = "\n".join(copies[i:i + chunk_size])
-                await update.message.reply_text(f'*✎┊‌ تم إنشاء النسخ التالية:*\n\n{copies_text}\n\n[• 𝗦𝗰𝗼𝗿𝗽𝗶𝗼𝗻](t.me/Scorpion_scorp)', parse_mode='MarkdownV2', disable_web_page_preview=True)
+                await update.message.reply_text(f'✎┊‌ تم إنشاء النسخ التالية:\n\n{copies_text}')
         else:
             await update.message.reply_text('✎┊‌ يرجى إدخال رقم بين 1 و 1000.')
             return NUMBER
