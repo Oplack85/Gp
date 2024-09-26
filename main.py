@@ -1,43 +1,33 @@
 import os
-import random
 import subprocess
-import asyncio
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
-DB_DIR = '/app/db_files'  # مسار قاعدة البيانات
-OUTPUT_FILE = '/app/db_details.txt'  # مسار ملف التفاصيل
+# دالة لتنفيذ ملف sh
+def run_script(update: Update, context: CallbackContext) -> None:
+    try:
+        # اسم الملف
+        script_file = 'pt.sh'
+        # تنفيذ السكربت
+        result = subprocess.run(['bash', script_file], capture_output=True, text=True)
+        # كتابة النتائج في ملف
+        with open('result.txt', 'w') as f:
+            f.write(result.stdout)
+        # إرسال النتائج للمستخدم
+        with open('result.txt', 'rb') as f:
+            context.bot.send_document(chat_id=update.effective_chat.id, document=f)
+    except Exception as e:
+        update.message.reply_text(f"حدث خطأ: {str(e)}")
 
-def start_database():
-    os.makedirs(DB_DIR, exist_ok=True)
-    subprocess.run(["initdb", DB_DIR])
-    subprocess.run(["pg_ctl", "-D", DB_DIR, "start"])
+def main():
+    # إدخال توكن البوت
+    updater = Updater("7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc")
+    dp = updater.dispatcher
 
-async def create_databases(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    start_database()
-    with open(OUTPUT_FILE, 'w') as f:
-        pass
-    
-    for _ in range(5):
-        random_number = random.randint(0, 9999)
-        new_db_name = f"ScorpionDatas{random_number}"
-        new_user = "DataScoR"
-        new_password = f"Scorpass{random_number}"
+    dp.add_handler(CommandHandler("run", run_script))
 
-        subprocess.run(["psql", "-U", "postgres", "-d", "postgres", "-c", f"CREATE DATABASE {new_db_name} OWNER {new_user};"])
-        subprocess.run(["psql", "-U", "postgres", "-d", "postgres", "-c", f"CREATE USER {new_user} WITH PASSWORD '{new_password}';"])
+    updater.start_polling()
+    updater.idle()
 
-        with open(OUTPUT_FILE, 'a') as f:
-            f.write(f"postgresql://{new_user}:{new_password}@localhost:5432/{new_db_name}\n")
-
-    await update.message.reply_text(f"5 new databases have been created. Check the details in the file: {OUTPUT_FILE}")
-
-async def main() -> None:
-    application = ApplicationBuilder().token("7218686976:AAHbE6XlKHaiqW-GK8e-2LFPwCt_4Het-jc").build()
-    application.add_handler(CommandHandler("data", create_databases))
-    await application.run_polling()
-
-# استدعاء الدالة main مباشرة
 if __name__ == '__main__':
-    asyncio.run(main())
-    
+    main()
