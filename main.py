@@ -7,10 +7,10 @@ EMAIL, NUMBER = range(2)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("*استنساخ البريد*", callback_data='clone_email')]
+        [InlineKeyboardButton("استنساخ بريد", callback_data='clone_email')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text('*✎┊‌ اضغط على الزر لاستنساخ البريد:*', reply_markup=reply_markup, parse_mode='MarkdownV2')
+    await update.message.reply_text('*✎┊‌ مرحبا بك في بوت استنساخ الايميلات 📧 \n\n فقط اضغط على الزر ادناه واتعبع الخطوات ✓*', reply_markup=reply_markup, parse_mode='MarkdownV2')
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
