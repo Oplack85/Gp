@@ -10,8 +10,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton("استنساخ البريد", callback_data='clone_email')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text('*[𝗖𝗽 𝗠𝗮𝗶𝗹 📬](t.me/Scorpion_scorp)\n\n*✎┊‌ مرحبا بك في بوت استنساخ الايميلات 📧*\n\n*✎┊‌ اضغط على الزر ادناه وٱتبع الخطوات ⬇️*', reply_markup=reply_markup, parse_mode='MarkdownV2', disable_web_page_preview=True)
-
+    await update.message.reply_text('*[𝗖𝗽 𝗠𝗮𝗶𝗹 📬](t.me/Scorpion_scorp)\n\n✎┊‌ مرحبا بك في بوت استنساخ الايميلات 📧 \n\n✎┊‌ اضغط على الزر ادناه وٱتبع الخطوات ⬇️*', reply_markup=reply_markup, parse_mode='MarkdownV2', disable_web_page_preview=True)
+    
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
