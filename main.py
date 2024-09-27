@@ -17,12 +17,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await query.answer()
     
     if query.data == 'clone_email':
-        await update.message.reply_text('*✎┊‌ يرجى إدخال البريد الإلكتروني الذي تريد استنساخه:*')
+        await update.message.reply_text('*✎┊‌ يرجى إدخال البريد الإلكتروني الذي تريد استنساخه:*', parse_mode='MarkdownV2')
         return EMAIL
 
 async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     original_email = update.message.text
-    await update.message.reply_text('*✎┊‌ يرجى إدخال عدد النسخ (حد أقصى 1000):*')
+    await update.message.reply_text('*✎┊‌ يرجى إدخال عدد النسخ (حد أقصى 1000):*', parse_mode='MarkdownV2')
     context.user_data['original_email'] = original_email
     return NUMBER
 
