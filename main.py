@@ -11,18 +11,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text('*[𝗖𝗽 𝗠𝗮𝗶𝗹 📬](t.me/Scorpion_scorp)\n\n✎┊‌ مرحبا بك في بوت استنساخ الايميلات 📧 \n\n✎┊‌ اضغط على الزر ادناه وٱتبع الخطوات ⬇️*', reply_markup=reply_markup, parse_mode='MarkdownV2', disable_web_page_preview=True)
-
+    
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
     
     if query.data == 'clone_email':
-        await query.edit_message_text(text='*✎┊‌ يرجى إدخال البريد الإلكتروني الذي تريد استنساخه:*', parse_mode='MarkdownV2')
+        await query.edit_message_text(text='✎┊‌ يرجى إدخال البريد الإلكتروني الذي تريد استنساخه:')
         return EMAIL
 
 async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     original_email = update.message.text
-    await update.message.reply_text('*✎┊‌ يرجى إدخال عدد النسخ (حد أقصى 1000):*', parse_mode='MarkdownV2')
+    await update.message.reply_text('✎┊‌ يرجى إدخال عدد النسخ (حد أقصى 1000):')
     context.user_data['original_email'] = original_email
     return NUMBER
 
@@ -37,19 +37,19 @@ async def receive_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             chunk_size = 100  # عدد النسخ في كل رسالة
             for i in range(0, len(copies), chunk_size):
                 copies_text = "\n".join(copies[i:i + chunk_size])
-                await update.message.reply_text(f'*✎┊‌ تم إنشاء النسخ التالية:*\n\n{copies_text}', parse_mode='MarkdownV2')
+                await update.message.reply_text(f'✎┊‌ تم إنشاء النسخ التالية:\n\n{copies_text}')
         else:
-            await update.message.reply_text('*✎┊‌ يرجى إدخال رقم بين 1 و 1000.*', parse_mode='MarkdownV2')
+            await update.message.reply_text('✎┊‌ يرجى إدخال رقم بين 1 و 1000.')
             return NUMBER
 
     except ValueError:
-        await update.message.reply_text('*✎┊‌ يرجى إدخال عدد صحيح.*', parse_mode='MarkdownV2')
+        await update.message.reply_text('✎┊‌ يرجى إدخال عدد صحيح.')
         return NUMBER
 
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text('*تم إلغاء العملية.*', parse_mode='MarkdownV2')
+    await update.message.reply_text('تم إلغاء العملية.')
     return ConversationHandler.END
 
 def main():
@@ -77,4 +77,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
