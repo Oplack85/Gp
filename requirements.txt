@@ -3,8 +3,4 @@ Flask==2.3.2
 Flask-RESTful==0.3.10
 gunicorn
 telethon
-python-dotenv
-pytube 
-instaloader 
-TikTokApi 
-telebot
+Pyrogram
