@@ -37,16 +37,18 @@ async def main() -> None:
 
     # أوامر البوت
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("anmin", add_admin))
+    application.add_handler(CommandHandler("admin", add_admin))
     application.add_handler(CommandHandler("ban", remove_user))
     application.add_handler(CommandHandler("wel", welcome))
-    application.add_handler(CommandHandler("rep", report_user))
+    application.add_handler(CommandHandler("repo", report_user))
 
     # فلترة الرسائل
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_message))
 
     # بدء تشغيل البوت
-    await application.start_polling()
+    await application.start()  # استبدل start_polling بـ start
+    await application.updater.start_polling()  # إذا كنت تريد استخدام polling بشكل إضافي
+    await application.updater.stop()  # لإيقافها عند الحاجة
     await application.idle()
 
 if __name__ == '__main__':
