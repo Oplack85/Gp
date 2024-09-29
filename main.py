@@ -1,59 +1,50 @@
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
+#By @N0040
+#Channel @B3kkk
 
-# استبدل هذا بالتوكن الخاص بالبوت
-TOKEN = "7054581703:AAGdJvc9RxOXMZhjahLlSTUN4LHoi8zR9qw"
+import requests
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# أمر /start 
-async def start(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("مرحبًا! أنا بوت حماية المجموعات.")
+app = Client("What-@B3KKK",
+api_id=14170449, 
+api_hash="03488b3c030fe095667e7ca22fe34954", 
+bot_token="7218686976:AAEUzTUoUBQsohKwDRM8-mMwcX24Cw4GrOk")
 
-# أمر لإضافة مدير
-async def add_admin(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("تم إضافة المدير بنجاح!")
 
-# أمر لإزالة مستخدم
-async def remove_user(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("تم إزالة المستخدم!")
+@app.on_message(filters.command("start") & filters.private)
+def start(client, message):
+    message.reply(f"Hello {message.from_user.mention} !\n› This bot is made to download from any site \n› Just send URL", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Source Channel", url="t.me/B3KKK")]]))
+@app.on_message(filters.text & filters.private)
+async def download(client, message):
+     EnyWeb = message.text 
+     Me = message.from_user.mention
+     x = await message.reply("🔍 Searching....")
+     try:
+       url='https://ssyoutube.com/api/convert'
+       head={
+'user_agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',}
+       data={'url':EnyWeb,}
+       req=requests.post(url,headers=head,data=data).json()
+       Media=req['url'][0]['url']
+     except Exception as e:
+        await x.delete()
+        print(e)
+        return await message.reply("› Invaild URL")
+     try:
+        caption = f"**Done By {Me}**"
+        await message.reply_audio(
+             Media,
+             caption=caption
+        )
+        await x.delete()
+     except Exception as e:
+        print(e)
+        await x.delete()
+        return await message.reply("An error !")
 
-# أمر للترحيب
-async def welcome(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("مرحبًا بالمستخدم الجديد!")
-
-# أمر للتبليغ عن مستخدم
-async def report_user(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("تم التبليغ عن المستخدم.")
-
-# الرد على الرسائل التي تحتوي على كلمات محظورة
-async def filter_message(update: Update, context: CallbackContext) -> None:
-    text = update.message.text
-    banned_words = ['كلمة1', 'كلمة2']  # أضف الكلمات المحظورة هنا
-    if any(word in text for word in banned_words):
-        await update.message.reply_text("تم اكتشاف كلمة محظورة!")
-
-async def main() -> None:
-    # إعداد التطبيق
-    application = Application.builder().token(TOKEN).build()
-
-    # تهيئة التطبيق قبل البدء
-    await application.initialize()
-
-    # أوامر البوت
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("admin", add_admin))
-    application.add_handler(CommandHandler("rm", remove_user))
-    application.add_handler(CommandHandler("wl", welcome))
-    application.add_handler(CommandHandler("ro", report_user))
-
-    # فلترة الرسائل
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_message))
-
-    # بدء تشغيل البوت
-    await application.start()
-    await application.updater.start_polling()  # إذا كنت تريد استخدام polling
-    await application.idle()
-
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+print("Wait........")
+app.run()
+print("Bot is run")
     
+#By @N0040
+#Channel @B3kkk  
