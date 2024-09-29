@@ -37,10 +37,10 @@ async def main() -> None:
 
     # أوامر البوت
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("اضف_مدير", add_admin))
-    application.add_handler(CommandHandler("احذف_مستخدم", remove_user))
-    application.add_handler(CommandHandler("ترحيب", welcome))
-    application.add_handler(CommandHandler("ابلاغ", report_user))
+    application.add_handler(CommandHandler("anmin", add_admin))
+    application.add_handler(CommandHandler("ban", remove_user))
+    application.add_handler(CommandHandler("wel", welcome))
+    application.add_handler(CommandHandler("rep", report_user))
 
     # فلترة الرسائل
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_message))
