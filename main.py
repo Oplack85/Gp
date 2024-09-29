@@ -1,50 +1,34 @@
-#By @N0040
-#Channel @B3kkk
-
+import telebot
 import requests
-from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+import json
+tok = "7218686976:AAEUzTUoUBQsohKwDRM8-mMwcX24Cw4GrOk"
+bot = telebot.TeleBot(tok)
 
-app = Client("What-@B3KKK",
-api_id=14170449, 
-api_hash="03488b3c030fe095667e7ca22fe34954", 
-bot_token="7218686976:AAEUzTUoUBQsohKwDRM8-mMwcX24Cw4GrOk")
+def ask_gpt(msg):
+    u = "https://us-central1-amor-ai.cloudfunctions.net/chatWithGPT"
+    p = json.dumps({"data": {"messages": [{"role": "user", "content": msg}]}})
+    h = {'User-Agent': "okhttp/5.0.0-alpha.2", 'Accept-Encoding': "gzip", 'content-type': "application/json; charset=utf-8"}
+    r = requests.post(u, data=p, headers=h).text
+    return json.loads(r)['result']['choices'][0]['message']['content']
 
+@bot.message_handler(commands=['start'])
+def send_welcome(m):
+    markup = telebot.types.InlineKeyboardMarkup()
+    btn = telebot.types.InlineKeyboardButton('بدء المحادثة مع GPT', callback_data='start_chat')
+    markup.add(btn)
+    bot.send_message(m.chat.id, "أهلاً بك! اضغط على الزر لبدء المحادثة مع الذكاء الاصطناعي.", reply_markup=markup)
 
-@app.on_message(filters.command("start") & filters.private)
-def start(client, message):
-    message.reply(f"Hello {message.from_user.mention} !\n› This bot is made to download from any site \n› Just send URL", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Source Channel", url="t.me/B3KKK")]]))
-@app.on_message(filters.text & filters.private)
-async def download(client, message):
-     EnyWeb = message.text 
-     Me = message.from_user.mention
-     x = await message.reply("🔍 Searching....")
-     try:
-       url='https://ssyoutube.com/api/convert'
-       head={
-'user_agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',}
-       data={'url':EnyWeb,}
-       req=requests.post(url,headers=head,data=data).json()
-       Media=req['url'][0]['url']
-     except Exception as e:
-        await x.delete()
-        print(e)
-        return await message.reply("› Invaild URL")
-     try:
-        caption = f"**Done By {Me}**"
-        await message.reply_audio(
-             Media,
-             caption=caption
-        )
-        await x.delete()
-     except Exception as e:
-        print(e)
-        await x.delete()
-        return await message.reply("An error !")
+@bot.callback_query_handler(func=lambda call: call.data == 'start_chat')
+def start_chat(c):
+    bot.send_message(c.message.chat.id, "تم بدء المحادثة. اكتب أي شيء للبدء في الحديث.")
+    bot.register_next_step_handler_by_chat_id(c.message.chat.id, handle_conversation)
 
-print("Wait........")
-app.run()
-print("Bot is run")
-    
-#By @N0040
-#Channel @B3kkk  
+def handle_conversation(m):
+    if m.text.lower() == 'انهاء':
+        bot.send_message(m.chat.id, "تم إنهاء المحادثة. اكتب /start للبدء من جديد.")
+        return
+    g = ask_gpt(m.text)
+    bot.send_message(m.chat.id, g)
+    bot.register_next_step_handler(m, handle_conversation)
+
+bot.infinity_polling()
