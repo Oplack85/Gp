@@ -6,5 +6,5 @@ telethon
 python-dotenv
 pytube 
 instaloader 
-tiktokapi 
+TikTokApi 
 telebot
