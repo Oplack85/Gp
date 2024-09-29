@@ -1,6 +1,7 @@
 import logging
 import os
-import subprocess
+import sys
+import asyncio
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
@@ -19,13 +20,21 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     await file.download_to_drive('code.py')
 
     try:
-        # تنفيذ code.py في الخلفية
-        process_code = subprocess.Popen(['python', 'code.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout_code, stderr_code = process_code.communicate()
+        # تنفيذ code.py بشكل غير متزامن
+        process = await asyncio.create_subprocess_exec(
+            'python', 'code.py',
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
 
-        output_code = stdout_code.decode() if stdout_code else stderr_code.decode()
+        output = stdout.decode() if stdout else stderr.decode()
         
-        await update.message.reply_text(f'نتيجة تنفيذ code.py:\n{output_code}')
+        await update.message.reply_text(f'نتيجة تنفيذ code.py:\n{output}')
+        
+        # إعادة تشغيل البوت
+        os.execv(sys.executable, ['python'] + sys.argv)
+        
     except Exception as e:
         await update.message.reply_text(f'حدث خطأ: {e}')
 
