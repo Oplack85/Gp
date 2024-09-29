@@ -4,3 +4,7 @@ Flask-RESTful==0.3.10
 gunicorn
 telethon
 python-dotenv
+pytube 
+instaloader 
+tiktokapi 
+telebot
