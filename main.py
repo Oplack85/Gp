@@ -1,34 +1,34 @@
 import os
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 from pytube import YouTube
 
 load_dotenv()  # تحميل المتغيرات البيئية
 BOT_TOKEN = os.getenv("BOT_TOKEN")  # استرجاع توكن البوت
 
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('أرسل لي رابط الفيديو من يوتيوب وسأقوم بتنزيله لك!')
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text('أرسل لي رابط الفيديو من يوتيوب وسأقوم بتنزيله لك!')
 
-def download_video(update: Update, context: CallbackContext) -> None:
+async def download_video(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     url = update.message.text
     try:
         yt = YouTube(url)
         video = yt.streams.get_highest_resolution()
         video.download()
-        update.message.reply_text(f'تم تنزيل الفيديو: {yt.title}')
+        await update.message.reply_text(f'تم تنزيل الفيديو: {yt.title}')
     except Exception as e:
-        update.message.reply_text('حدث خطأ: ' + str(e))
+        await update.message.reply_text('حدث خطأ: ' + str(e))
 
-def main() -> None:
-    updater = Updater(BOT_TOKEN)
-    dispatcher = updater.dispatcher
+async def main() -> None:
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, download_video))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, download_video))
 
-    updater.start_polling()
-    updater.idle()
+    await application.run_polling()
 
 if __name__ == '__main__':
-    main()
+    import asyncio
+    asyncio.run(main())
+    
