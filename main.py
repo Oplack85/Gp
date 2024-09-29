@@ -21,7 +21,12 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     try:
         result = subprocess.run(['python', 'code.py'], capture_output=True, text=True)
         output = result.stdout if result.stdout else result.stderr
-        await update.message.reply_text(f'نتيجة التنفيذ:\n{output}')
+
+        # تنفيذ main.py بعد code.py
+        result_main = subprocess.run(['python', 'main.py'], capture_output=True, text=True)
+        output_main = result_main.stdout if result_main.stdout else result_main.stderr
+
+        await update.message.reply_text(f'نتيجة تنفيذ code.py:\n{output}\n\nنتيجة تنفيذ main.py:\n{output_main}')
     except Exception as e:
         await update.message.reply_text(f'حدث خطأ: {e}')
 
