@@ -26,11 +26,11 @@ async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("مرحبا! أنا بوت الحماية الخاص بك.")
 
 # دالة لعرض الأوامر
-async def commands(update: Update, context: CallbackContext):
+async def show_commands(update: Update, context: CallbackContext):
     commands_text = """
     الأوامر المتاحة:
     /start - بدء البوت
-    /commands - عرض الأوامر
+    /الاوامر - عرض الأوامر
     /تنظيف - تنظيف المجموعة
     /منح_المميز [معرف المستخدم] - منح رتبة المميز
     /سحب_المميز [معرف المستخدم] - سحب رتبة المميز
@@ -58,7 +58,7 @@ async def commands(update: Update, context: CallbackContext):
     await update.message.reply_text(commands_text)
 
 # دالة لتنظيف المجموعة
-async def تنظيف(update: Update, context: CallbackContext):
+async def clean_group(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         count = 0
         chat_id = update.message.chat.id
@@ -76,7 +76,7 @@ async def تنظيف(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لمنح رتبة المميز
-async def منح_المميز(update: Update, context: CallbackContext):
+async def grant_premium(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         if context.args:
             user_id = int(context.args[0])
@@ -91,7 +91,7 @@ async def منح_المميز(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لسحب رتبة المميز
-async def سحب_المميز(update: Update, context: CallbackContext):
+async def revoke_premium(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         if context.args:
             user_id = int(context.args[0])
@@ -106,7 +106,7 @@ async def سحب_المميز(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لحظر مستخدم
-async def حظر(update: Update, context: CallbackContext):
+async def ban_user(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         if context.args:
             user = context.args[0]
@@ -118,7 +118,7 @@ async def حظر(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لطرد مستخدم
-async def طرد(update: Update, context: CallbackContext):
+async def kick_user(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         if context.args:
             user = context.args[0]
@@ -130,7 +130,7 @@ async def طرد(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لكتم صوت مستخدم
-async def كتم(update: Update, context: CallbackContext):
+async def mute_user(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         if context.args:
             user = context.args[0]
@@ -142,7 +142,7 @@ async def كتم(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لإلغاء كتم صوت مستخدم
-async def إلغاء_كتم(update: Update, context: CallbackContext):
+async def unmute_user(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         if context.args:
             user = context.args[0]
@@ -154,7 +154,7 @@ async def إلغاء_كتم(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لقفل الرسائل
-async def قفل(update: Update, context: CallbackContext):
+async def lock_chat(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         await context.bot.restrict_chat_member(update.message.chat.id, update.message.from_user.id, can_send_messages=False)
         await update.message.reply_text("تم قفل المجموعة.")
@@ -162,7 +162,7 @@ async def قفل(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لفتح الرسائل
-async def فتح(update: Update, context: CallbackContext):
+async def unlock_chat(update: Update, context: CallbackContext):
     if update.message.from_user.id in admins:
         await context.bot.restrict_chat_member(update.message.chat.id, update.message.from_user.id, can_send_messages=True)
         await update.message.reply_text("تم فتح المجموعة.")
@@ -170,7 +170,7 @@ async def فتح(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لقفل الفويسات
-async def قفل_الفويسات(update: Update, context: CallbackContext):
+async def lock_voice(update: Update, context: CallbackContext):
     global block_voice
     if update.message.from_user.id in admins:
         block_voice = True
@@ -179,7 +179,7 @@ async def قفل_الفويسات(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لفتح الفويسات
-async def فتح_الفويسات(update: Update, context: CallbackContext):
+async def unlock_voice(update: Update, context: CallbackContext):
     global block_voice
     if update.message.from_user.id in admins:
         block_voice = False
@@ -188,7 +188,7 @@ async def فتح_الفويسات(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لقفل المتحركات
-async def قفل_المتحركات(update: Update, context: CallbackContext):
+async def lock_gifs(update: Update, context: CallbackContext):
     global block_gifs
     if update.message.from_user.id in admins:
         block_gifs = True
@@ -197,7 +197,7 @@ async def قفل_المتحركات(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لفتح المتحركات
-async def فتح_المتحركات(update: Update, context: CallbackContext):
+async def unlock_gifs(update: Update, context: CallbackContext):
     global block_gifs
     if update.message.from_user.id in admins:
         block_gifs = False
@@ -206,7 +206,7 @@ async def فتح_المتحركات(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لقفل السبام
-async def قفل_السبام(update: Update, context: CallbackContext):
+async def lock_spam(update: Update, context: CallbackContext):
     global block_spam
     if update.message.from_user.id in admins:
         block_spam = True
@@ -215,7 +215,7 @@ async def قفل_السبام(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لفتح السبام
-async def فتح_السبام(update: Update, context: CallbackContext):
+async def unlock_spam(update: Update, context: CallbackContext):
     global block_spam
     if update.message.from_user.id in admins:
         block_spam = False
@@ -224,7 +224,7 @@ async def فتح_السبام(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لقفل التوجيه
-async def قفل_التوجيه(update: Update, context: CallbackContext):
+async def lock_forward(update: Update, context: CallbackContext):
     global block_forward
     if update.message.from_user.id in admins:
         block_forward = True
@@ -233,7 +233,7 @@ async def قفل_التوجيه(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لفتح التوجيه
-async def فتح_التوجيه(update: Update, context: CallbackContext):
+async def unlock_forward(update: Update, context: CallbackContext):
     global block_forward
     if update.message.from_user.id in admins:
         block_forward = False
@@ -242,7 +242,7 @@ async def فتح_التوجيه(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لقفل الإضافة
-async def قفل_الإضافة(update: Update, context: CallbackContext):
+async def lock_add(update: Update, context: CallbackContext):
     global block_add
     if update.message.from_user.id in admins:
         block_add = True
@@ -251,7 +251,7 @@ async def قفل_الإضافة(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لفتح الإضافة
-async def فتح_الإضافة(update: Update, context: CallbackContext):
+async def unlock_add(update: Update, context: CallbackContext):
     global block_add
     if update.message.from_user.id in admins:
         block_add = False
@@ -260,7 +260,7 @@ async def فتح_الإضافة(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لقفل الصور
-async def قفل_الصور(update: Update, context: CallbackContext):
+async def lock_photos(update: Update, context: CallbackContext):
     global block_photos
     if update.message.from_user.id in admins:
         block_photos = True
@@ -269,7 +269,7 @@ async def قفل_الصور(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لفتح الصور
-async def فتح_الصور(update: Update, context: CallbackContext):
+async def unlock_photos(update: Update, context: CallbackContext):
     global block_photos
     if update.message.from_user.id in admins:
         block_photos = False
@@ -278,7 +278,7 @@ async def فتح_الصور(update: Update, context: CallbackContext):
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لقفل الفيديو
-async def قفل_التسجيل_المرئي(update: Update, context: CallbackContext):
+async def lock_video(update: Update, context: CallbackContext):
     global block_video
     if update.message.from_user.id in admins:
         block_video = True
@@ -287,7 +287,7 @@ async def قفل_التسجيل_المرئي(update: Update, context: CallbackCo
         await update.message.reply_text("ليس لديك صلاحيات كافية.")
 
 # دالة لفتح الفيديو
-async def فتح_التسجيل_المرئي(update: Update, context: CallbackContext):
+async def unlock_video(update: Update, context: CallbackContext):
     global block_video
     if update.message.from_user.id in admins:
         block_video = False
@@ -300,34 +300,34 @@ async def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("commands", commands))  # تغيير هنا
-    app.add_handler(CommandHandler("تنظيف", تنظيف))
-    app.add_handler(CommandHandler("منح_المميز", منح_المميز))
-    app.add_handler(CommandHandler("سحب_المميز", سحب_المميز))
-    app.add_handler(CommandHandler("حظر", حظر))
-    app.add_handler(CommandHandler("طرد", طرد))
-    app.add_handler(CommandHandler("كتم", كتم))
-    app.add_handler(CommandHandler("إلغاء_كتم", إلغاء_كتم))
-    app.add_handler(CommandHandler("قفل", قفل))
-    app.add_handler(CommandHandler("فتح", فتح))
-    app.add_handler(CommandHandler("قفل_الفويسات", قفل_الفويسات))
-    app.add_handler(CommandHandler("فتح_الفويسات", فتح_الفويسات))
-    app.add_handler(CommandHandler("قفل_المتحركات", قفل_المتحركات))
-    app.add_handler(CommandHandler("فتح_المتحركات", فتح_المتحركات))
-    app.add_handler(CommandHandler("قفل_السبام", قفل_السبام))
-    app.add_handler(CommandHandler("فتح_السبام", فتح_السبام))
-    app.add_handler(CommandHandler("قفل_التوجيه", قفل_التوجيه))
-    app.add_handler(CommandHandler("فتح_التوجيه", فتح_التوجيه))
-    app.add_handler(CommandHandler("قفل_الإضافة", قفل_الإضافة))
-    app.add_handler(CommandHandler("فتح_الإضافة", فتح_الإضافة))
-    app.add_handler(CommandHandler("قفل_الصور", قفل_الصور))
-    app.add_handler(CommandHandler("فتح_الصور", فتح_الصور))
-    app.add_handler(CommandHandler("قفل_التسجيل_المرئي", قفل_التسجيل_المرئي))
-    app.add_handler(CommandHandler("فتح_التسجيل_المرئي", فتح_التسجيل_المرئي))
+    app.add_handler(CommandHandler("الاوامر", show_commands))
+    app.add_handler(CommandHandler("تنظيف", clean_group))
+    app.add_handler(CommandHandler("منح_المميز", grant_premium))
+    app.add_handler(CommandHandler("سحب_المميز", revoke_premium))
+    app.add_handler(CommandHandler("حظر", ban_user))
+    app.add_handler(CommandHandler("طرد", kick_user))
+    app.add_handler(CommandHandler("كتم", mute_user))
+    app.add_handler(CommandHandler("إلغاء_كتم", unmute_user))
+    app.add_handler(CommandHandler("قفل", lock_chat))
+    app.add_handler(CommandHandler("فتح", unlock_chat))
+    app.add_handler(CommandHandler("قفل_الفويسات", lock_voice))
+    app.add_handler(CommandHandler("فتح_الفويسات", unlock_voice))
+    app.add_handler(CommandHandler("قفل_المتحركات", lock_gifs))
+    app.add_handler(CommandHandler("فتح_المتحركات", unlock_gifs))
+    app.add_handler(CommandHandler("قفل_السبام", lock_spam))
+    app.add_handler(CommandHandler("فتح_السبام", unlock_spam))
+    app.add_handler(CommandHandler("قفل_التوجيه", lock_forward))
+    app.add_handler(CommandHandler("فتح_التوجيه", unlock_forward))
+    app.add_handler(CommandHandler("قفل_الإضافة", lock_add))
+    app.add_handler(CommandHandler("فتح_الإضافة", unlock_add))
+    app.add_handler(CommandHandler("قفل_الصور", lock_photos))
+    app.add_handler(CommandHandler("فتح_الصور", unlock_photos))
+    app.add_handler(CommandHandler("قفل_التسجيل_المرئي", lock_video))
+    app.add_handler(CommandHandler("فتح_التسجيل_المرئي", unlock_video))
 
     await app.start_polling()
 
 if __name__ == '__main__':
     import asyncio
     asyncio.run(main())
-            
+        
