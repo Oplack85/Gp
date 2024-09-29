@@ -4,3 +4,4 @@ Flask-RESTful==0.3.10
 gunicorn
 telethon
 Pyrogram
+requests
