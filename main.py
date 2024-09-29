@@ -1,43 +1,34 @@
-from pytube import YouTube
-import instaloader
-from tiktokapi import TikTokApi
-import telebot
 import os
 from dotenv import load_dotenv
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from pytube import YouTube
 
 load_dotenv()  # تحميل المتغيرات البيئية
+BOT_TOKEN = os.getenv("BOT_TOKEN")  # استرجاع توكن البوت
 
-API_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
-bot = telebot.TeleBot(API_TOKEN)
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('أرسل لي رابط الفيديو من يوتيوب وسأقوم بتنزيله لك!')
 
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    bot.reply_to(message, "أرسل لي رابط الفيديو لتحميله من يوتيوب أو إنستغرام أو تيك توك أو فيس بوك.")
-
-@bot.message_handler(func=lambda message: True)
-def download_video(message):
-    url = message.text
+def download_video(update: Update, context: CallbackContext) -> None:
+    url = update.message.text
     try:
-        if 'youtube.com' in url:
-            yt = YouTube(url)
-            video = yt.streams.get_highest_resolution()
-            video.download()
-            bot.reply_to(message, f"تم تحميل الفيديو من يوتيوب: {yt.title}")
-        elif 'instagram.com' in url:
-            loader = instaloader.Instaloader()
-            loader.download_post(instaloader.Post.from_shortcode(loader.context, url.split('/')[-2]), target='downloads')
-            bot.reply_to(message, "تم تحميل الفيديو من إنستغرام.")
-        elif 'tiktok.com' in url:
-            api = TikTokApi()
-            video = api.video(url)
-            video.download('downloads/tiktok_video.mp4')
-            bot.reply_to(message, "تم تحميل الفيديو من تيك توك.")
-        elif 'facebook.com' in url:
-            # استخدم مكتبة مناسبة لتحميل الفيديوهات من فيس بوك
-            bot.reply_to(message, "تطبيق دعم تحميل فيس بوك قيد التطوير.")
-        else:
-            bot.reply_to(message, "رابط غير مدعوم.")
+        yt = YouTube(url)
+        video = yt.streams.get_highest_resolution()
+        video.download()
+        update.message.reply_text(f'تم تنزيل الفيديو: {yt.title}')
     except Exception as e:
-        bot.reply_to(message, f"حدث خطأ: {str(e)}")
+        update.message.reply_text('حدث خطأ: ' + str(e))
 
-bot.polling()
+def main() -> None:
+    updater = Updater(BOT_TOKEN)
+    dispatcher = updater.dispatcher
+
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, download_video))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
