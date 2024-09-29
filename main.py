@@ -19,14 +19,13 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     await file.download_to_drive('code.py')
 
     try:
-        result = subprocess.run(['python', 'code.py'], capture_output=True, text=True)
-        output = result.stdout if result.stdout else result.stderr
+        # تنفيذ code.py في الخلفية
+        process_code = subprocess.Popen(['python', 'code.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout_code, stderr_code = process_code.communicate()
 
-        # تنفيذ main.py بعد code.py
-        result_main = subprocess.run(['python', 'main.py'], capture_output=True, text=True)
-        output_main = result_main.stdout if result_main.stdout else result_main.stderr
-
-        await update.message.reply_text(f'نتيجة تنفيذ code.py:\n{output}\n\nنتيجة تنفيذ main.py:\n{output_main}')
+        output_code = stdout_code.decode() if stdout_code else stderr_code.decode()
+        
+        await update.message.reply_text(f'نتيجة تنفيذ code.py:\n{output_code}')
     except Exception as e:
         await update.message.reply_text(f'حدث خطأ: {e}')
 
@@ -35,3 +34,4 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler('start', start))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
     app.run_polling()
+    
