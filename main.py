@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
 # استبدل هذا بالتوكن الخاص بالبوت
-TOKEN = "7218686976:AAEUzTUoUBQsohKwDRM8-mMwcX24Cw4GrOk"
+TOKEN = "7054581703:AAGdJvc9RxOXMZhjahLlSTUN4LHoi8zR9qw"
 
 # أمر /start 
 async def start(update: Update, context: CallbackContext) -> None:
