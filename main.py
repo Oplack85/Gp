@@ -1,46 +1,43 @@
-import logging
+from pytube import YouTube
+import instaloader
+from tiktokapi import TikTokApi
+import telebot
 import os
-import sys
-import asyncio
 from dotenv import load_dotenv
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
 load_dotenv()  # تحميل المتغيرات البيئية
 
-TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+API_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+bot = telebot.TeleBot(API_TOKEN)
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "أرسل لي رابط الفيديو لتحميله من يوتيوب أو إنستغرام أو تيك توك أو فيس بوك.")
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text('أرسل لي ملفاً لتنفيذ الكود!')
-
-async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    file = await update.message.document.get_file()
-    await file.download_to_drive('code.py')
-
+@bot.message_handler(func=lambda message: True)
+def download_video(message):
+    url = message.text
     try:
-        # تنفيذ code.py بشكل غير متزامن
-        process = await asyncio.create_subprocess_exec(
-            'python', 'code.py',
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
-
-        output = stdout.decode() if stdout else stderr.decode()
-        
-        await update.message.reply_text(f'نتيجة تنفيذ code.py:\n{output}')
-        
-        # إعادة تشغيل البوت
-        os.execv(sys.executable, ['python'] + sys.argv)
-        
+        if 'youtube.com' in url:
+            yt = YouTube(url)
+            video = yt.streams.get_highest_resolution()
+            video.download()
+            bot.reply_to(message, f"تم تحميل الفيديو من يوتيوب: {yt.title}")
+        elif 'instagram.com' in url:
+            loader = instaloader.Instaloader()
+            loader.download_post(instaloader.Post.from_shortcode(loader.context, url.split('/')[-2]), target='downloads')
+            bot.reply_to(message, "تم تحميل الفيديو من إنستغرام.")
+        elif 'tiktok.com' in url:
+            api = TikTokApi()
+            video = api.video(url)
+            video.download('downloads/tiktok_video.mp4')
+            bot.reply_to(message, "تم تحميل الفيديو من تيك توك.")
+        elif 'facebook.com' in url:
+            # استخدم مكتبة مناسبة لتحميل الفيديوهات من فيس بوك
+            bot.reply_to(message, "تطبيق دعم تحميل فيس بوك قيد التطوير.")
+        else:
+            bot.reply_to(message, "رابط غير مدعوم.")
     except Exception as e:
-        await update.message.reply_text(f'حدث خطأ: {e}')
+        bot.reply_to(message, f"حدث خطأ: {str(e)}")
 
-if __name__ == '__main__':
-    app = ApplicationBuilder().token(TOKEN).build()
-    app.add_handler(CommandHandler('start', start))
-    app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
-    app.run_polling()
-    
+bot.polling()
