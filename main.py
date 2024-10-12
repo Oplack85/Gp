@@ -11,6 +11,7 @@ translator = GoogleTranslator(source='en', target='ar')
 current_word = ''
 difficulty_level = ''
 user_coins = {}  # قاموس لتتبع العملات الذهبية لكل مستخدم
+translation_enabled = {}  # قاموس لتتبع حالة تفعيل ترجمة النصوص لكل مستخدم
 
 # تحميل الكلمات من ملف النص وتصنيفها حسب الطول
 def load_words_from_file(file_path='words_list.txt'):
@@ -46,6 +47,7 @@ def get_random_word(level, previous_word):
 def start(message):
     user_id = message.from_user.id
     user_coins[user_id] = user_coins.get(user_id, 0)  # تهيئة العملات الذهبية للمستخدم إن لم تكن موجودة
+    translation_enabled[user_id] = False  # تهيئة حالة الترجمة إلى غير مفعلة
 
     markup = InlineKeyboardMarkup()
     markup.row_width = 3
@@ -53,6 +55,7 @@ def start(message):
         InlineKeyboardButton("سهل", callback_data='easy'),
         InlineKeyboardButton("متوسط", callback_data='medium'),
         InlineKeyboardButton("صعب", callback_data='hard'),
+        InlineKeyboardButton("ترجمة النصوص: معطلة", callback_data='toggle_translation'),
         InlineKeyboardButton("🌟 نجماتي", callback_data='my_coins')
     )
     bot.send_message(message.chat.id, f"*✎┊‌ مرحباً بك في بوت اللغة الانجليزية \n✎┊‌ يعطي هذا البوت كلمات انجليزية على مستويات عديده مع امكانية ترجمتها ✓*\n\n*اختر مستوى الصعوبة:*", reply_markup=markup)
@@ -69,6 +72,21 @@ def set_difficulty(call):
     bot.answer_callback_query(call.id, f'*تم اختيار المستوى: {difficulty_level.capitalize()}*')
     send_random_word(call.message)
 
+# تبديل حالة تفعيل ترجمة النصوص
+@bot.callback_query_handler(func=lambda call: call.data == 'toggle_translation')
+def toggle_translation(call):
+    user_id = call.from_user.id
+    translation_enabled[user_id] = not translation_enabled.get(user_id, False)  # تبديل حالة الترجمة
+
+    status = "مفعلة" if translation_enabled[user_id] else "معطلة"
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 3
+    markup.add(
+        InlineKeyboardButton("ترجمة النصوص: " + status, callback_data='toggle_translation')
+    )
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markup)
+    bot.answer_callback_query(call.id, f'تم {status} ترجمة النصوص!')
+
 # إرسال كلمة عشوائية بناءً على مستوى الصعوبة
 def send_random_word(message):
     global current_word, difficulty_level
@@ -78,7 +96,7 @@ def send_random_word(message):
     markup.add(InlineKeyboardButton("ترجمة الكلمة", callback_data='translate'))
     bot.send_message(message.chat.id, f'*✎┊‌ ما هي ترجمة الكلمة التالية:\n-  {current_word} *', reply_markup=markup)
 
-# التحقق من الإجابة أو ترجمة النصوص العادية
+# التحقق من الإجابة أو ترجمة النصوص العادية إذا كانت الترجمة مفعلة
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     global current_word
@@ -91,8 +109,7 @@ def handle_message(message):
         user_coins[user_id] = user_coins.get(user_id, 0) + 1  # إضافة نجمة للمستخدم
         bot.send_message(message.chat.id, f'*إجابة صحيحة! 🎉 لقد حصلت على نجمة 🌟. الآن لديك {user_coins[user_id]} نجمة.*')
         send_random_word(message)
-    else:
-        # إذا لم تكن الإجابة صحيحة أو لم تكن محاولة للإجابة، قم بترجمة النص المرسل
+    elif translation_enabled.get(user_id, False):  # ترجمة النص إذا كانت الترجمة مفعلة
         translated_text = translator.translate(message.text)
         bot.send_message(message.chat.id, f'*ترجمة النص:\n- {translated_text}*')
 
@@ -124,3 +141,4 @@ def another_word(call):
 
 # بدء البوت
 bot.polling()
+    
