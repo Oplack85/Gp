@@ -10,6 +10,7 @@ bot = telebot.TeleBot(TOKEN)
 translator = GoogleTranslator(source='en', target='ar')
 current_word = ''
 difficulty_level = ''
+user_coins = {}  # قاموس لتتبع العملات الذهبية لكل مستخدم
 
 # تحميل الكلمات من ملف النص وتصنيفها حسب الطول
 def load_words_from_file(file_path='words_list.txt'):
@@ -44,20 +45,28 @@ def get_random_word(level):
 # بدء المحادثة وتحديد مستوى الصعوبة
 @bot.message_handler(commands=['start'])
 def start(message):
+    user_id = message.from_user.id
+    user_coins[user_id] = user_coins.get(user_id, 0)  # تهيئة العملات الذهبية للمستخدم إن لم تكن موجودة
+
     markup = InlineKeyboardMarkup()
     markup.row_width = 3
     markup.add(
         InlineKeyboardButton("سهل", callback_data='easy'),
         InlineKeyboardButton("متوسط", callback_data='medium'),
-        InlineKeyboardButton("صعب", callback_data='hard')
+        InlineKeyboardButton("صعب", callback_data='hard'),
+        InlineKeyboardButton("💰 عملاتي", callback_data='my_coins')
     )
-    bot.send_message(message.chat.id, "اختر مستوى الصعوبة:", reply_markup=markup)
+    bot.send_message(message.chat.id, f"مرحباً بك! لديك {user_coins[user_id]} عملة ذهبية.\nاختر مستوى الصعوبة:", reply_markup=markup)
 
 # معالجة اختيار مستوى الصعوبة
 @bot.callback_query_handler(func=lambda call: call.data in ['easy', 'medium', 'hard'])
 def set_difficulty(call):
     global difficulty_level
     difficulty_level = call.data
+
+    # حذف رسالة الترحيب بعد اختيار المستوى
+    bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+
     bot.answer_callback_query(call.id, f'تم اختيار المستوى: {difficulty_level.capitalize()}')
     send_random_word(call.message)
 
@@ -74,11 +83,13 @@ def send_random_word(message):
 @bot.message_handler(func=lambda message: True)
 def check_answer(message):
     global current_word
+    user_id = message.from_user.id
     user_answer = message.text.lower()
     translation = translator.translate(current_word).lower()
 
     if user_answer == translation:
-        bot.send_message(message.chat.id, 'إجابة صحيحة! 🎉')
+        user_coins[user_id] = user_coins.get(user_id, 0) + 1  # إضافة عملة ذهبية للمستخدم
+        bot.send_message(message.chat.id, f'إجابة صحيحة! 🎉 لقد حصلت على عملة ذهبية. الآن لديك {user_coins[user_id]} عملة ذهبية.')
     else:
         bot.send_message(message.chat.id, f'إجابة خاطئة! الترجمة الصحيحة هي: {translation}')
 
@@ -96,6 +107,14 @@ def translate_word(call):
     bot.answer_callback_query(call.id)
     bot.send_message(call.message.chat.id, f'ترجمة الكلمة "{current_word}" هي: {translation}', reply_markup=markup)
 
+# عرض العملات الذهبية للمستخدم
+@bot.callback_query_handler(func=lambda call: call.data == 'my_coins')
+def show_coins(call):
+    user_id = call.from_user.id
+    coins = user_coins.get(user_id, 0)
+    bot.answer_callback_query(call.id)
+    bot.send_message(call.message.chat.id, f'لديك {coins} عملة ذهبية.')
+
 # إعطاء كلمة جديدة من نفس المستوى عند اختيار "كلمة أخرى"
 @bot.callback_query_handler(func=lambda call: call.data == 'another_word')
 def another_word(call):
@@ -104,3 +123,4 @@ def another_word(call):
 
 # بدء البوت
 bot.polling()
+    
