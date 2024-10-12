@@ -33,14 +33,13 @@ def load_words_from_file(file_path='words_list.txt'):
 # تحميل الكلمات بناءً على مستوى الصعوبة
 easy_words, medium_words, hard_words = load_words_from_file()
 
-# اختيار كلمة عشوائية بناءً على مستوى الصعوبة
-def get_random_word(level):
-    if level == 'easy':
-        return random.choice(easy_words)
-    elif level == 'medium':
-        return random.choice(medium_words)
-    elif level == 'hard':
-        return random.choice(hard_words)
+# اختيار كلمة عشوائية بناءً على مستوى الصعوبة، مع التأكد من أنها مختلفة عن الكلمة السابقة
+def get_random_word(level, previous_word):
+    word_list = easy_words if level == 'easy' else medium_words if level == 'medium' else hard_words
+    new_word = random.choice(word_list)
+    while new_word == previous_word:  # ضمان عدم تكرار الكلمة السابقة
+        new_word = random.choice(word_list)
+    return new_word
 
 # بدء المحادثة وتحديد مستوى الصعوبة
 @bot.message_handler(commands=['start'])
@@ -56,7 +55,7 @@ def start(message):
         InlineKeyboardButton("صعب", callback_data='hard'),
         InlineKeyboardButton("💰 عملاتي", callback_data='my_coins')
     )
-    bot.send_message(message.chat.id, f"مرحباً بك! لديك {user_coins[user_id]} عملة ذهبية.\nاختر مستوى الصعوبة:", reply_markup=markup)
+    bot.send_message(message.chat.id, f"✎┊‌ مرحباً بك في بوت اللغة الانجليزية\n اختر مستوى الصعوبة:", reply_markup=markup)
 
 # معالجة اختيار مستوى الصعوبة
 @bot.callback_query_handler(func=lambda call: call.data in ['easy', 'medium', 'hard'])
@@ -73,7 +72,7 @@ def set_difficulty(call):
 # إرسال كلمة عشوائية بناءً على مستوى الصعوبة
 def send_random_word(message):
     global current_word, difficulty_level
-    current_word = get_random_word(difficulty_level)
+    current_word = get_random_word(difficulty_level, current_word)
 
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("ترجمة الكلمة", callback_data='translate'))
@@ -123,4 +122,3 @@ def another_word(call):
 
 # بدء البوت
 bot.polling()
-    
