@@ -55,7 +55,7 @@ def start(message):
         InlineKeyboardButton("صعب", callback_data='hard'),
         InlineKeyboardButton("💰 عملاتي", callback_data='my_coins')
     )
-    bot.send_message(message.chat.id, f"*مرحباً بك! لديك {user_coins[user_id]} عملة ذهبية.*\n*اختر مستوى الصعوبة:*", reply_markup=markup)
+    bot.send_message(message.chat.id, f"*✎┊‌ مرحباً بك في بوت اللغة الانجليزية \n يعطي هذا البوت كلمات انجليزية على مستويات عديده مع امكانية ترجمتها ✓*\n*اختر مستوى الصعوبة:*", reply_markup=markup)
 
 # معالجة اختيار مستوى الصعوبة
 @bot.callback_query_handler(func=lambda call: call.data in ['easy', 'medium', 'hard'])
