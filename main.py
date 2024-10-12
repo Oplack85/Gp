@@ -1,14 +1,14 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 import random
 import nltk
 
 # ضع رمز API للبوت هنا
-TOKEN = '7218686976:AAHn7mwAZQUjLxBWVtanhR5Tqc9O38INcCs'
+TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
 
 bot = telebot.TeleBot(TOKEN)
-translator = Translator()
+translator = GoogleTranslator(source='en', target='ar')
 current_word = ''
 difficulty_level = ''
 
@@ -64,7 +64,7 @@ def send_random_word(message):
 def check_answer(message):
     global current_word
     user_answer = message.text.lower()
-    translation = translator.translate(current_word, dest='ar').text.lower()
+    translation = translator.translate(current_word).lower()
 
     if user_answer == translation:
         bot.send_message(message.chat.id, 'إجابة صحيحة! 🎉')
@@ -77,7 +77,7 @@ def check_answer(message):
 @bot.callback_query_handler(func=lambda call: call.data == 'translate')
 def translate_word(call):
     global current_word
-    translation = translator.translate(current_word, dest='ar').text
+    translation = translator.translate(current_word)
 
     # إضافة زر "كلمة أخرى" بعد الترجمة
     markup = InlineKeyboardMarkup()
@@ -93,4 +93,3 @@ def another_word(call):
 
 # بدء البوت
 bot.polling()
-    
