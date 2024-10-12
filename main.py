@@ -1,6 +1,6 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from random_words import RandomWords
+from random_word import RandomWords
 from googletrans import Translator
 
 # ضع رمز API للبوت هنا
@@ -15,13 +15,14 @@ difficulty_level = ''
 # توليد قوائم الكلمات بناءً على مستوى الصعوبة
 def get_random_word(level):
     while True:
-        word = rw.random_word()
-        if level == 'easy' and len(word) <= 4:
-            return word
-        elif level == 'medium' and 5 <= len(word) <= 7:
-            return word
-        elif level == 'hard' and len(word) > 7:
-            return word
+        word = rw.get_random_word()
+        if word:
+            if level == 'easy' and len(word) <= 4:
+                return word
+            elif level == 'medium' and 5 <= len(word) <= 7:
+                return word
+            elif level == 'hard' and len(word) > 7:
+                return word
 
 # بدء المحادثة وتحديد مستوى الصعوبة
 @bot.message_handler(commands=['start'])
