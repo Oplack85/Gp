@@ -17,9 +17,9 @@ nltk.download('words')
 from nltk.corpus import words
 
 # إنشاء قوائم الكلمات بناءً على مستوى الصعوبة
-easy_words = [word for word in words.words() if 2 <= len(word) <= 4]
-medium_words = [word for word in words.words() if 4 <= len(word) <= 7]
-hard_words = [word for word in words.words() if len(word) > 7]
+easy_words = [word for word in words.words() if 2 <= len(word) <= 4 and not word[0].isupper()]
+medium_words = [word for word in words.words() if 4 <= len(word) <= 7 and not word[0].isupper()]
+hard_words = [word for word in words.words() if len(word) > 7 and not word[0].isupper()]
 
 # اختيار كلمة عشوائية بناءً على مستوى الصعوبة
 def get_random_word(level):
@@ -93,3 +93,4 @@ def another_word(call):
 
 # بدء البوت
 bot.polling()
+    
