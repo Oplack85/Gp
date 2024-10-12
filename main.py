@@ -2,7 +2,6 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from deep_translator import GoogleTranslator
 import random
-import nltk
 
 # ضع رمز API للبوت هنا
 TOKEN = '7218686976:AAHn7mwAZQUjLxBWVtanhR5Tqc9O38INcCs'
@@ -12,20 +11,26 @@ translator = GoogleTranslator(source='en', target='ar')
 current_word = ''
 difficulty_level = ''
 
-# تحميل الموارد اللازمة من مكتبة nltk
-nltk.download('words')
-nltk.download('averaged_perceptron_tagger')
-from nltk.corpus import words
+# تحميل الكلمات من ملف النص وتصنيفها حسب الطول
+def load_words_from_file(file_path='words_list.txt'):
+    easy_words = []
+    medium_words = []
+    hard_words = []
 
-# دالة للتحقق من ما إذا كانت الكلمة فعل (verb)
-def is_verb(word):
-    pos_tag = nltk.pos_tag([word])[0][1]
-    return pos_tag.startswith('V')  # تحقق مما إذا كان نوع الكلمة فعل
+    with open(file_path, 'r') as file:
+        for line in file:
+            word = line.strip()
+            if 2 <= len(word) <= 4:
+                easy_words.append(word)
+            elif 4 < len(word) <= 7:
+                medium_words.append(word)
+            elif len(word) > 7:
+                hard_words.append(word)
 
-# إنشاء قوائم الكلمات بناءً على مستوى الصعوبة والتي تكون فقط أفعال
-easy_words = [word for word in words.words() if 2 <= len(word) <= 4 and not word[0].isupper() and is_verb(word)]
-medium_words = [word for word in words.words() if 4 <= len(word) <= 7 and not word[0].isupper() and is_verb(word)]
-hard_words = [word for word in words.words() if len(word) > 7 and not word[0].isupper() and is_verb(word)]
+    return easy_words, medium_words, hard_words
+
+# تحميل الكلمات بناءً على مستوى الصعوبة
+easy_words, medium_words, hard_words = load_words_from_file()
 
 # اختيار كلمة عشوائية بناءً على مستوى الصعوبة
 def get_random_word(level):
