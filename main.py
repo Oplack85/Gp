@@ -1,28 +1,34 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from random_word import RandomWords
 from googletrans import Translator
+import random
+import nltk
 
 # ضع رمز API للبوت هنا
 TOKEN = '7218686976:AAHn7mwAZQUjLxBWVtanhR5Tqc9O38INcCs'
 
 bot = telebot.TeleBot(TOKEN)
-rw = RandomWords()
 translator = Translator()
 current_word = ''
 difficulty_level = ''
 
-# توليد قوائم الكلمات بناءً على مستوى الصعوبة
+# تحميل الموارد اللازمة من مكتبة nltk
+nltk.download('words')
+from nltk.corpus import words
+
+# إنشاء قوائم الكلمات بناءً على مستوى الصعوبة
+easy_words = [word for word in words.words() if 2 <= len(word) <= 4]
+medium_words = [word for word in words.words() if 4 <= len(word) <= 7]
+hard_words = [word for word in words.words() if len(word) > 7]
+
+# اختيار كلمة عشوائية بناءً على مستوى الصعوبة
 def get_random_word(level):
-    while True:
-        word = rw.get_random_word()
-        if word:
-            if level == 'easy' and len(word) <= 4:
-                return word
-            elif level == 'medium' and 5 <= len(word) <= 7:
-                return word
-            elif level == 'hard' and len(word) > 7:
-                return word
+    if level == 'easy':
+        return random.choice(easy_words)
+    elif level == 'medium':
+        return random.choice(medium_words)
+    elif level == 'hard':
+        return random.choice(hard_words)
 
 # بدء المحادثة وتحديد مستوى الصعوبة
 @bot.message_handler(commands=['start'])
@@ -87,3 +93,4 @@ def another_word(call):
 
 # بدء البوت
 bot.polling()
+    
