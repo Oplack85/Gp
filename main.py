@@ -5,7 +5,7 @@ import random
 import nltk
 
 # ضع رمز API للبوت هنا
-TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+TOKEN = '7218686976:AAHn7mwAZQUjLxBWVtanhR5Tqc9O38INcCs'
 
 bot = telebot.TeleBot(TOKEN)
 translator = GoogleTranslator(source='en', target='ar')
