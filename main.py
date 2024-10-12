@@ -78,21 +78,23 @@ def send_random_word(message):
     markup.add(InlineKeyboardButton("ترجمة الكلمة", callback_data='translate'))
     bot.send_message(message.chat.id, f'*✎┊‌ ما هي ترجمة الكلمة التالية:\n-  {current_word} *', reply_markup=markup)
 
-# التحقق من الإجابة
+# التحقق من الإجابة أو ترجمة النصوص العادية
 @bot.message_handler(func=lambda message: True)
-def check_answer(message):
+def handle_message(message):
     global current_word
     user_id = message.from_user.id
     user_answer = message.text.lower()
     translation = translator.translate(current_word).lower()
 
+    # التحقق مما إذا كان النص هو إجابة للكلمة العشوائية الحالية
     if user_answer == translation:
-        user_coins[user_id] = user_coins.get(user_id, 0) + 1  # إضافة عملة ذهبية للمستخدم
+        user_coins[user_id] = user_coins.get(user_id, 0) + 1  # إضافة نجمة للمستخدم
         bot.send_message(message.chat.id, f'*إجابة صحيحة! 🎉 لقد حصلت على نجمة 🌟. الآن لديك {user_coins[user_id]} نجمة.*')
+        send_random_word(message)
     else:
-        bot.send_message(message.chat.id, f'*✎┊‌ إجابة خاطئة! الترجمة الصحيحة هي:\n-  {translation}*')
-
-    send_random_word(message)
+        # إذا لم تكن الإجابة صحيحة أو لم تكن محاولة للإجابة، قم بترجمة النص المرسل
+        translated_text = translator.translate(message.text)
+        bot.send_message(message.chat.id, f'*ترجمة النص:\n- {translated_text}*')
 
 # ترجمة الكلمة وعرض زر "كلمة أخرى"
 @bot.callback_query_handler(func=lambda call: call.data == 'translate')
