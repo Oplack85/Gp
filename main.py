@@ -1,34 +1,88 @@
 import telebot
-import requests
-import json
-tok = "7218686976:AAEUzTUoUBQsohKwDRM8-mMwcX24Cw4GrOk"
-bot = telebot.TeleBot(tok)
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from random_words import RandomWords
+from googletrans import Translator
 
-def ask_gpt(msg):
-    u = "https://us-central1-amor-ai.cloudfunctions.net/chatWithGPT"
-    p = json.dumps({"data": {"messages": [{"role": "user", "content": msg}]}})
-    h = {'User-Agent': "okhttp/5.0.0-alpha.2", 'Accept-Encoding': "gzip", 'content-type': "application/json; charset=utf-8"}
-    r = requests.post(u, data=p, headers=h).text
-    return json.loads(r)['result']['choices'][0]['message']['content']
+# ضع رمز API للبوت هنا
+TOKEN = '7218686976:AAHn7mwAZQUjLxBWVtanhR5Tqc9O38INcCs'
 
+bot = telebot.TeleBot(TOKEN)
+rw = RandomWords()
+translator = Translator()
+current_word = ''
+difficulty_level = ''
+
+# توليد قوائم الكلمات بناءً على مستوى الصعوبة
+def get_random_word(level):
+    while True:
+        word = rw.random_word()
+        if level == 'easy' and len(word) <= 4:
+            return word
+        elif level == 'medium' and 5 <= len(word) <= 7:
+            return word
+        elif level == 'hard' and len(word) > 7:
+            return word
+
+# بدء المحادثة وتحديد مستوى الصعوبة
 @bot.message_handler(commands=['start'])
-def send_welcome(m):
-    markup = telebot.types.InlineKeyboardMarkup()
-    btn = telebot.types.InlineKeyboardButton('بدء المحادثة مع GPT', callback_data='start_chat')
-    markup.add(btn)
-    bot.send_message(m.chat.id, "أهلاً بك! اضغط على الزر لبدء المحادثة مع الذكاء الاصطناعي.", reply_markup=markup)
+def start(message):
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 3
+    markup.add(
+        InlineKeyboardButton("سهل", callback_data='easy'),
+        InlineKeyboardButton("متوسط", callback_data='medium'),
+        InlineKeyboardButton("صعب", callback_data='hard')
+    )
+    bot.send_message(message.chat.id, "اختر مستوى الصعوبة:", reply_markup=markup)
 
-@bot.callback_query_handler(func=lambda call: call.data == 'start_chat')
-def start_chat(c):
-    bot.send_message(c.message.chat.id, "تم بدء المحادثة. اكتب أي شيء للبدء في الحديث.")
-    bot.register_next_step_handler_by_chat_id(c.message.chat.id, handle_conversation)
+# معالجة اختيار مستوى الصعوبة
+@bot.callback_query_handler(func=lambda call: call.data in ['easy', 'medium', 'hard'])
+def set_difficulty(call):
+    global difficulty_level
+    difficulty_level = call.data
+    bot.answer_callback_query(call.id, f'تم اختيار المستوى: {difficulty_level.capitalize()}')
+    send_random_word(call.message)
 
-def handle_conversation(m):
-    if m.text.lower() == 'انهاء':
-        bot.send_message(m.chat.id, "تم إنهاء المحادثة. اكتب /start للبدء من جديد.")
-        return
-    g = ask_gpt(m.text)
-    bot.send_message(m.chat.id, g)
-    bot.register_next_step_handler(m, handle_conversation)
+# إرسال كلمة عشوائية بناءً على مستوى الصعوبة
+def send_random_word(message):
+    global current_word, difficulty_level
+    current_word = get_random_word(difficulty_level)
 
-bot.infinity_polling()
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("ترجمة الكلمة", callback_data='translate'))
+    bot.send_message(message.chat.id, f'ما هي ترجمة الكلمة التالية: {current_word}؟', reply_markup=markup)
+
+# التحقق من الإجابة
+@bot.message_handler(func=lambda message: True)
+def check_answer(message):
+    global current_word
+    user_answer = message.text.lower()
+    translation = translator.translate(current_word, dest='ar').text.lower()
+
+    if user_answer == translation:
+        bot.send_message(message.chat.id, 'إجابة صحيحة! 🎉')
+    else:
+        bot.send_message(message.chat.id, f'إجابة خاطئة! الترجمة الصحيحة هي: {translation}')
+
+    send_random_word(message)
+
+# ترجمة الكلمة وعرض زر "كلمة أخرى"
+@bot.callback_query_handler(func=lambda call: call.data == 'translate')
+def translate_word(call):
+    global current_word
+    translation = translator.translate(current_word, dest='ar').text
+
+    # إضافة زر "كلمة أخرى" بعد الترجمة
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("كلمة أخرى", callback_data='another_word'))
+    bot.answer_callback_query(call.id)
+    bot.send_message(call.message.chat.id, f'ترجمة الكلمة "{current_word}" هي: {translation}', reply_markup=markup)
+
+# إعطاء كلمة جديدة من نفس المستوى عند اختيار "كلمة أخرى"
+@bot.callback_query_handler(func=lambda call: call.data == 'another_word')
+def another_word(call):
+    bot.answer_callback_query(call.id)
+    send_random_word(call.message)
+
+# بدء البوت
+bot.polling()
