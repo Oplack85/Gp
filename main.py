@@ -14,12 +14,18 @@ difficulty_level = ''
 
 # تحميل الموارد اللازمة من مكتبة nltk
 nltk.download('words')
+nltk.download('averaged_perceptron_tagger')
 from nltk.corpus import words
 
-# إنشاء قوائم الكلمات بناءً على مستوى الصعوبة
-easy_words = [word for word in words.words() if 2 <= len(word) <= 4 and not word[0].isupper()]
-medium_words = [word for word in words.words() if 4 <= len(word) <= 7 and not word[0].isupper()]
-hard_words = [word for word in words.words() if len(word) > 7 and not word[0].isupper()]
+# دالة للتحقق من ما إذا كانت الكلمة فعل (verb)
+def is_verb(word):
+    pos_tag = nltk.pos_tag([word])[0][1]
+    return pos_tag.startswith('V')  # تحقق مما إذا كان نوع الكلمة فعل
+
+# إنشاء قوائم الكلمات بناءً على مستوى الصعوبة والتي تكون فقط أفعال
+easy_words = [word for word in words.words() if 2 <= len(word) <= 4 and not word[0].isupper() and is_verb(word)]
+medium_words = [word for word in words.words() if 4 <= len(word) <= 7 and not word[0].isupper() and is_verb(word)]
+hard_words = [word for word in words.words() if len(word) > 7 and not word[0].isupper() and is_verb(word)]
 
 # اختيار كلمة عشوائية بناءً على مستوى الصعوبة
 def get_random_word(level):
@@ -93,4 +99,3 @@ def another_word(call):
 
 # بدء البوت
 bot.polling()
-    
