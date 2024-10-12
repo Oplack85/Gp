@@ -4,7 +4,7 @@ from deep_translator import GoogleTranslator
 import random
 
 # ضع رمز API للبوت هنا
-TOKEN = '7218686976:AAHn7mwAZQUjLxBWVtanhR5Tqc9O38INcCs'
+TOKEN = '7218686976:AAHkq616O2ysHWRNwayaALkClOwd1ADphRg'
 
 bot = telebot.TeleBot(TOKEN, parse_mode='Markdown')  # استخدام Markdown لتنسيق الرسائل
 translator = GoogleTranslator(source='en', target='ar')
