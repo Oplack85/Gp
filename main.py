@@ -6,7 +6,7 @@ import random
 # ضع رمز API للبوت هنا
 TOKEN = '7218686976:AAHn7mwAZQUjLxBWVtanhR5Tqc9O38INcCs'
 
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN, parse_mode='Markdown')  # استخدام Markdown لتنسيق الرسائل
 translator = GoogleTranslator(source='en', target='ar')
 current_word = ''
 difficulty_level = ''
@@ -55,7 +55,7 @@ def start(message):
         InlineKeyboardButton("صعب", callback_data='hard'),
         InlineKeyboardButton("💰 عملاتي", callback_data='my_coins')
     )
-    bot.send_message(message.chat.id, f"✎┊‌ مرحباً بك في بوت اللغة الانجليزية\n اختر مستوى الصعوبة:", reply_markup=markup)
+    bot.send_message(message.chat.id, f"*مرحباً بك! لديك {user_coins[user_id]} عملة ذهبية.*\n*اختر مستوى الصعوبة:*", reply_markup=markup)
 
 # معالجة اختيار مستوى الصعوبة
 @bot.callback_query_handler(func=lambda call: call.data in ['easy', 'medium', 'hard'])
@@ -66,7 +66,7 @@ def set_difficulty(call):
     # حذف رسالة الترحيب بعد اختيار المستوى
     bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
 
-    bot.answer_callback_query(call.id, f'تم اختيار المستوى: {difficulty_level.capitalize()}')
+    bot.answer_callback_query(call.id, f'*تم اختيار المستوى: {difficulty_level.capitalize()}*')
     send_random_word(call.message)
 
 # إرسال كلمة عشوائية بناءً على مستوى الصعوبة
@@ -76,7 +76,7 @@ def send_random_word(message):
 
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("ترجمة الكلمة", callback_data='translate'))
-    bot.send_message(message.chat.id, f'ما هي ترجمة الكلمة التالية: {current_word}؟', reply_markup=markup)
+    bot.send_message(message.chat.id, f'*ما هي ترجمة الكلمة التالية: {current_word}؟*', reply_markup=markup)
 
 # التحقق من الإجابة
 @bot.message_handler(func=lambda message: True)
@@ -88,9 +88,9 @@ def check_answer(message):
 
     if user_answer == translation:
         user_coins[user_id] = user_coins.get(user_id, 0) + 1  # إضافة عملة ذهبية للمستخدم
-        bot.send_message(message.chat.id, f'إجابة صحيحة! 🎉 لقد حصلت على عملة ذهبية. الآن لديك {user_coins[user_id]} عملة ذهبية.')
+        bot.send_message(message.chat.id, f'*إجابة صحيحة! 🎉 لقد حصلت على عملة ذهبية. الآن لديك {user_coins[user_id]} عملة ذهبية.*')
     else:
-        bot.send_message(message.chat.id, f'إجابة خاطئة! الترجمة الصحيحة هي: {translation}')
+        bot.send_message(message.chat.id, f'*إجابة خاطئة! الترجمة الصحيحة هي: {translation}*')
 
     send_random_word(message)
 
@@ -104,7 +104,7 @@ def translate_word(call):
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("كلمة أخرى", callback_data='another_word'))
     bot.answer_callback_query(call.id)
-    bot.send_message(call.message.chat.id, f'ترجمة الكلمة "{current_word}" هي: {translation}', reply_markup=markup)
+    bot.send_message(call.message.chat.id, f'*ترجمة الكلمة "{current_word}" هي: {translation}*', reply_markup=markup)
 
 # عرض العملات الذهبية للمستخدم
 @bot.callback_query_handler(func=lambda call: call.data == 'my_coins')
@@ -112,7 +112,7 @@ def show_coins(call):
     user_id = call.from_user.id
     coins = user_coins.get(user_id, 0)
     bot.answer_callback_query(call.id)
-    bot.send_message(call.message.chat.id, f'لديك {coins} عملة ذهبية.')
+    bot.send_message(call.message.chat.id, f'*لديك {coins} عملة ذهبية.*')
 
 # إعطاء كلمة جديدة من نفس المستوى عند اختيار "كلمة أخرى"
 @bot.callback_query_handler(func=lambda call: call.data == 'another_word')
